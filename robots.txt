@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /sushiswap/
-Sitemap: https://avax-staking.github.io/sitemap.xml
+Sitemap: INSERT_URL/sitemap.xml
