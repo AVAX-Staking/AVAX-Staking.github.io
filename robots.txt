@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://avax-staking.github.io/sitemap.xml
