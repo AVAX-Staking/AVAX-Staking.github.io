@@ -1,22 +1,22 @@
 {
- "name": "Core Stake",
- "short_name": "Core Stake",
- "start_url": "/",
- "display": "standalone",
- "background_color": "#FFFFFF",
- "theme_color": "#FFFFFF",
- "icons": [
-  {
-   "src": "static/icon-192.png",
-   "sizes": "192x192",
-   "type": "image/png",
-   "purpose": "any maskable"
-  },
-  {
-   "src": "static/icon-512.png",
-   "sizes": "512x512",
-   "type": "image/png",
-   "purpose": "any maskable"
-  }
- ]
+  "name": "Avax Staking",
+  "short_name": "Avax Staking",
+  "description": "Avax Staking lets you stake AVAX and earn staking rewards from your own wallet.",
+  "start_url": "https://avax-staking.github.io/",
+  "scope": "https://avax-staking.github.io/",
+  "display": "standalone",
+  "background_color": "#F7F4F2",
+  "theme_color": "#E84142",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
