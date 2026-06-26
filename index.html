@@ -3,122 +3,419 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Avax Staking</title>
-  <meta name="description" content="Avax Staking lets you stake AVAX and earn staking rewards from your own wallet.">
+  <title>Avax Staking - Decentralized DeFi Portal</title>
+  <meta name="description" content="Secure, non-custodial portal for Avax Staking DeFi operations directly from your own wallet.">
   <link rel="canonical" href="https://avax-staking.github.io/">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="theme-color" content="#F7F4F2">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Avax Staking">
-  <meta property="og:description" content="Avax Staking lets you stake AVAX and earn staking rewards from your own wallet.">
-  <meta property="og:url" content="https://avax-staking.github.io/">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Avax Staking">
-  <meta name="twitter:description" content="Avax Staking lets you stake AVAX and earn staking rewards from your own wallet.">
+  <meta name="robots" content="index,follow">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="favicon.png">
   <link rel="manifest" href="site.webmanifest">
-  <link rel="stylesheet" href="style.css">
+  <link rel="prefetch" href="dashboard/">
+  <link rel="prerender" href="dashboard/">
+  <style>
+
+
+:root {
+  --bg: #f7f4f2;
+  --bg-soft: #fbfaf8;
+  --surface: #ffffff;
+  --surface-muted: #f4f1ee;
+  --ink: #181514;
+  --muted: #6e6763;
+  --faint: #9b928d;
+  --accent: #e84142;
+  --accent-deep: #c92f32;
+  --accent-soft: rgba(232, 65, 66, .09);
+  --line: rgba(24, 21, 20, .10);
+  --line-strong: rgba(24, 21, 20, .17);
+  --shadow: 0 30px 70px -34px rgba(24, 21, 20, .34);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  background:
+    radial-gradient(58% 42% at 50% -12%, rgba(232, 65, 66, .11), transparent 62%),
+    linear-gradient(180deg, var(--bg-soft), var(--bg));
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+.topbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px clamp(16px, 4vw, 42px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 1.04rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.brand img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(24, 21, 20, .08);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.6vw, 28px);
+  margin-left: clamp(4px, 1.6vw, 16px);
+}
+
+.nav a {
+  color: var(--muted);
+  font-size: .93rem;
+  font-weight: 560;
+  transition: color .16s ease;
+}
+
+.nav a:hover {
+  color: var(--ink);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 17px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .48);
+  color: var(--ink);
+  font-size: .9rem;
+  font-weight: 760;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px -22px rgba(24, 21, 20, .4);
+  transition: border-color .16s ease, transform .16s ease, background .16s ease;
+}
+
+.ghost:hover {
+  transform: translateY(-1px);
+  border-color: rgba(232, 65, 66, .42);
+  background: #fff;
+}
+
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px clamp(16px, 4vw, 42px) 10px;
+  text-align: center;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-size: clamp(2.58rem, 6.4vw, 4.32rem);
+  line-height: 1.04;
+  font-weight: 860;
+  letter-spacing: 0;
+}
+
+.sub {
+  max-width: 50ch;
+  margin-top: 15px;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.5vw, 1.16rem);
+}
+
+.sub strong {
+  color: var(--ink);
+  font-weight: 780;
+  box-shadow: inset 0 -.48em 0 var(--accent-soft);
+}
+
+.card {
+  width: min(590px, 100%);
+  margin-top: clamp(24px, 4.5vh, 38px);
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(255, 255, 255, .9)),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.route {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.leg {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface-muted);
+  text-align: left;
+}
+
+.label {
+  display: block;
+  color: var(--faint);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin-top: 9px;
+}
+
+.icon {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(24, 21, 20, .08);
+}
+
+.token {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 840;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.switch {
+  flex: none;
+  align-self: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--accent);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 14px 28px -24px rgba(24, 21, 20, .55);
+  transition: background .16s ease, border-color .16s ease, transform .18s ease;
+}
+
+.switch span {
+  display: block;
+  font-size: 1.14rem;
+  line-height: 1;
+}
+
+.switch:hover {
+  transform: translateY(-1px) rotate(180deg);
+  border-color: rgba(232, 65, 66, .45);
+  background: var(--accent-soft);
+}
+
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 16px;
+  border-radius: 16px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1.06rem;
+  font-weight: 840;
+  box-shadow: 0 18px 38px -24px rgba(232, 65, 66, .78);
+  transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+
+.cta:hover {
+  transform: translateY(-1px);
+  background: var(--accent-deep);
+  box-shadow: 0 22px 44px -24px rgba(232, 65, 66, .86);
+}
+
+.foot {
+  flex: none;
+  padding: 15px 24px 22px;
+  color: var(--faint);
+  font-size: .86rem;
+  font-weight: 620;
+  text-align: center;
+}
+
+@media (max-width: 680px) {
+  .topbar {
+    gap: 10px;
+    padding-top: 14px;
+    padding-bottom: 12px;
+  }
+
+  .brand {
+    font-size: .98rem;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .ghost {
+    min-height: 36px;
+    padding-inline: 14px;
+    font-size: .86rem;
+  }
+
+  .stage {
+    justify-content: center;
+    padding-top: 8px;
+    padding-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(2.42rem, 11vw, 3.1rem);
+  }
+
+  .sub {
+    max-width: 31ch;
+    margin-top: 12px;
+    font-size: .98rem;
+  }
+
+  .card {
+    margin-top: 22px;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .route {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .leg {
+    padding: 12px 14px;
+  }
+
+  .switch {
+    width: 40px;
+    height: 40px;
+  }
+
+  .switch span {
+    transform: rotate(90deg);
+  }
+
+  .cta {
+    min-height: 52px;
+    margin-top: 14px;
+  }
+
+  .foot {
+    padding-top: 10px;
+    padding-bottom: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand span {
+    max-width: 138px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ghost {
+    padding-inline: 12px;
+  }
+}
+
+
+  
+.footer {
+  text-align: center !important;
+}
+  </style>
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#" aria-label="Avax Staking home">
-      <img src="favicon.png" width="28" height="28" alt="">
+    <div class="brand">
+      <img src="favicon.png" width="30" height="30" alt="">
       <span>Avax Staking</span>
-    </a>
-    <nav class="nav" aria-label="Trusted references">
-      <a href="https://snowtrace.io/" target="_blank" rel="nofollow noopener noreferrer">Snowtrace</a>
-      <a href="https://www.avax.network/build/validators" target="_blank" rel="nofollow noopener noreferrer">Validators</a>
-      <a href="https://defillama.com/chain/avalanche" target="_blank" rel="nofollow noopener noreferrer">DeFiLlama</a>
-    </nav>
+    </div>
     <span class="spacer"></span>
-    <a class="ghost" href="https://avalanche-ecosystem.github.io/" rel="noopener noreferrer">Open app</a>
+    <nav class="nav" aria-label="Main Navigation">
+      <a href="how-it-works/">How it works</a>
+      <a href="faq/">FAQ</a>
+      <a href="about/">About</a>
+      <a href="security/">Security</a>
+      <a href="supported-chains/">Supported Chains</a>
+    </nav>
   </header>
-
-  <main class="stage">
-    <section class="hero" aria-labelledby="page-title">
-      <h1 id="page-title">Avax Staking</h1>
-      <p class="sub"><strong>Avax Staking</strong> lets you stake AVAX and earn staking rewards from your own wallet.</p>
-    </section>
-
-    <section class="card" aria-label="Staking route">
-      <div class="route">
-        <div class="leg">
-          <span class="label">Stake</span>
-          <span class="chip">
-            <img class="icon" src="avax.png" width="28" height="28" alt="AVAX">
-            <span class="token">AVAX</span>
-          </span>
-        </div>
-        <button class="switch" type="button" data-switch aria-label="Switch staking route">
-          <span aria-hidden="true">&#8594;</span>
-        </button>
-        <div class="leg">
-          <span class="label">Receive</span>
-          <span class="chip">
-            <img class="icon" src="savax.png" width="28" height="28" alt="sAVAX">
-            <span class="token">sAVAX</span>
-          </span>
-        </div>
-      </div>
-      <a class="cta" href="https://avalanche-ecosystem.github.io/" rel="noopener noreferrer">Enter App <span aria-hidden="true">&#8250;</span></a>
-    </section>
+  <main class="stage" style="padding: 100px 24px; text-align: center; max-width: 800px; margin: 0 auto;">
+    <h1 style="font-size: clamp(2.5rem, 6vw, 4.5rem); margin-bottom: 24px; font-weight: 800;">Avax Staking</h1>
+    <p class="value" style="font-size: 1.25rem; opacity: 0.8; margin-bottom: 40px; line-height: 1.6;">Secure, non-custodial gateway for decentralized operations. Connect your Web3 wallet to enter the portal.</p>
+    <a class="open-app" href="dashboard/" style="display: inline-flex; justify-content: center; align-items: center; min-height: 52px; padding: 0 32px; border-radius: 9999px; background: var(--accent, #625bf3); color: #fff; font-weight: 700; text-decoration: none; font-size: 1.1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: transform 0.2s ease;">Open App Dashboard</a>
   </main>
-
-  <footer class="foot">Avax Staking &mdash; 2026</footer>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://avalanche-ecosystem.github.io/#website",
-        "url": "https://avalanche-ecosystem.github.io/",
-        "name": "Avax Staking",
-        "inLanguage": "en"
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://avalanche-ecosystem.github.io/#organization",
-        "name": "Avax Staking",
-        "url": "https://avalanche-ecosystem.github.io/",
-        "logo": "https://avalanche-ecosystem.github.io/favicon.png"
-      },
-      {
-        "@type": "WebApplication",
-        "@id": "https://avalanche-ecosystem.github.io/#app",
-        "name": "Avax Staking",
-        "applicationCategory": "FinanceApplication",
-        "operatingSystem": "Web",
-        "url": "https://avalanche-ecosystem.github.io/",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
-      }
-    ]
-  }
-  </script>
-
-  <script>
-  (function(){
-    "use strict";
-    var button = document.querySelector("[data-switch]");
-    if (!button) return;
-    button.addEventListener("click", function(){
-      var chips = document.querySelectorAll(".leg .chip");
-      var labels = document.querySelectorAll(".leg .label");
-      if (chips.length < 2 || labels.length < 2) return;
-      var chip = chips[0].innerHTML;
-      chips[0].innerHTML = chips[1].innerHTML;
-      chips[1].innerHTML = chip;
-      var label = labels[0].textContent;
-      labels[0].textContent = labels[1].textContent;
-      labels[1].textContent = label;
-    });
-  })();
-  </script>
+  <footer class="footer">Avax Staking &mdash; 2026</footer>
 </body>
 </html>
