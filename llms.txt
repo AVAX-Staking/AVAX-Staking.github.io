@@ -1,0 +1,58 @@
+# Avax Staking
+> Avax staking covers native AVAX staking and liquid-staking routes such as sAVAX that provide rewards for helping secure Avalanche.
+
+## What is Avax Staking
+Native staking locks AVAX on Avalanche’s P-Chain through validation or delegation. Validators operate nodes; delegators assign stake weight to an existing validator without transferring private keys to that operator. Liquid staking instead deposits AVAX into a protocol that delegates pooled funds and issues a transferable receipt token such as sAVAX. This dashboard is independent and informational: it compares routes and live terms but does not hold funds or sign transactions.
+
+## How it works
+1. Choose native delegation, node validation, or a liquid-staking route according to custody, liquidity, and infrastructure requirements.
+2. For native staking, move AVAX to the P-Chain, select a validator or supply a NodeID, choose the amount and term, specify return and reward addresses, then sign the P-Chain transaction.
+3. For liquid staking, connect a self-custody wallet on the C-Chain, deposit AVAX into the selected protocol, and receive sAVAX; the protocol pools AVAX and delegates it on the P-Chain.
+4. Native principal and qualifying rewards return automatically when the term ends. Liquid-staking rewards accrue through the AVAX-to-sAVAX exchange rate and redemption follows the protocol’s withdrawal process.
+
+## Key facts
+- Avalanche Mainnet has network ID `1`; its C-Chain EVM chain ID is `43114`.
+- Native staking runs on the P-Chain, identified by alias `P`, not in a C-Chain smart contract.
+- Mainnet P-Chain addresses use Bech32 formatting beginning `P-avax1`.
+- Native delegation requires at least 25 AVAX; validation requires at least 2,000 AVAX.
+- Native staking terms range from 14 days to one year and cannot be ended or modified early.
+- Validators must satisfy the protocol’s 80% uptime threshold for themselves and their delegators to receive rewards.
+- Avalanche native staking has no slashing; failed performance can forfeit rewards but not principal.
+- Validators set a delegation fee deducted from rewards, with a protocol minimum of 2%.
+- Native rewards and principal are paid automatically to the designated addresses after the staking term.
+- sAVAX is a C-Chain liquid-staking token at `0x2b2C81e08f1Af8835a78Bb2A90AE924ACE0eA4bE`.
+
+## Common questions
+- **Is AVAX staking safe?** Native staking avoids protocol slashing, but wallet compromise, AVAX price changes, validator underperformance, and lockup risk remain. Liquid staking adds smart-contract, operational, liquidity, and sAVAX exchange-rate risks.
+- **Who controls my AVAX?** Native delegators retain their keys while the protocol time-locks their AVAX. Liquid staking is wallet-controlled but places assets into protocol contracts and infrastructure.
+- **What fees apply?** Native users pay network transaction costs and the validator’s reward fee. Liquid routes may add protocol, swap, or redemption costs disclosed by the executing app.
+- **How long does it take?** Native stake remains locked for the chosen term. BENQI documents a 15-day sAVAX unstaking cooldown followed by a two-day redemption window; secondary-market swaps have separate pricing and liquidity.
+- **Which assets and chains are supported?** Native staking uses AVAX on the P-Chain. The dashboard’s liquid route concerns AVAX and sAVAX on Avalanche C-Chain.
+- **How do I start?** Hold AVAX in a compatible self-custody wallet, compare native and liquid routes, verify the network, validator or contract, fees, term, and output, then approve through the chosen staking app.
+- **Can I cancel after signing?** Native staking cannot be cancelled early. sAVAX can be transferred or traded, while protocol redemption follows its published cooldown and claim rules.
+
+## App
+- Dashboard: https://avax-staking.github.io/
+- App: https://avax-staking.github.io/dashboard/
+
+## Official resources
+Avalanche Staking Guide: https://build.avax.network/docs/primary-network/validate/how-to-stake
+Avalanche Rewards Formula: https://build.avax.network/docs/primary-network/validate/rewards-formula
+Avalanche Primary Network: https://build.avax.network/docs/primary-network
+Core Stake: https://core.app/stake/
+Core Delegation Guide: https://support.core.app/en/articles/8117272-core-web-how-do-i-delegate-in-core-stake
+BENQI Liquid Staking Overview: https://docs.benqi.fi/benqi-liquid-staking/overview
+BENQI Liquid Staking App: https://staking.benqi.fi/stake
+BENQI sAVAX Contract: https://docs.benqi.fi/resources/contracts/liquid-staking
+BENQI Risks and Audits: https://docs.benqi.fi/resources/risks
+Avalanche P-Chain Explorer: https://subnets.avax.network/p-chain
+AvalancheGo Source: https://github.com/ava-labs/avalanchego
+Avalanche X: https://x.com/avax
+BENQI X: https://x.com/BenqiFinance
+
+## Data & references
+Avascan P-Chain Explorer: https://avascan.info/blockchain/p/home
+CoinGecko AVAX: https://www.coingecko.com/en/coins/avalanche
+DefiLlama Avalanche: https://defillama.com/chain/avalanche
+Chain-List Avalanche C-Chain: https://chain-list.com/avalanche-c-chain
+Wikipedia Avalanche: https://en.wikipedia.org/wiki/Avalanche_%28blockchain_platform%29
