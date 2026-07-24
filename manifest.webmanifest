@@ -1,0 +1,19 @@
+{
+  "name": "Avax Staking",
+  "short_name": "Avax Staking",
+  "description": "Avax Staking compared: native P-Chain delegation, running a validator, and sAVAX liquid staking — how rewards, lock-ups, and withdrawals actually work.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "lang": "en",
+  "background_color": "#f5f6f8",
+  "theme_color": "#f5f6f8",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
