@@ -1,45 +1,27 @@
-# Avax Staking — Technical Reference & Staking Knowledge Base
+# Avax Staking
 
-> Avax Staking compared: native P-Chain delegation, running a validator, and sAVAX liquid staking — how rewards, lock-ups, and withdrawals actually work.
+> Avax Staking earns AVAX rewards by delegating tokens to an Avalanche validator. The page includes an interactive calculator for staking income after validator reward fees.
 
-## Key Facts & Smart Contract Specs
-- **Protocol Class**: Non-Custodial Decentralized Staking Infrastructure
-- **Supported Chain IDs**: 43114
-- **Protocol Fee Structure**: 0.00% Markup Fee (Standard Network Gas Only)
-- **Custody Architecture**: Non-custodial — assets delegated or staked via smart contracts; private keys remain in user self-custody
-- **Verified Contract Addresses**: `0x2b2C81e08f1Af8835a78Bb2A90AE924ACE0eA4bE`
-- **Security & Audits**: Open-source smart contracts audited by leading security firms; verified on block explorers
-- **Practitioner Test Verification**: Tested & Verified by Practitioner (July 2026)
+## Pages
+- [Avax Staking](https://insert_url/): Rewards calculator, staking options, fees, payout timing, security, and FAQ.
+- [Dashboard](https://insert_url/dashboard/): Staking dashboard destination.
 
-## How Avax Staking Works
+## Calculator
+Inputs: AVAX amount, gross APR, staking term in days, and validator reward fee.
+Net reward = amount x (APR / 100) x (days / 365) x (1 - fee / 100).
+Annualized rewards = amount x (APR / 100) x (1 - fee / 100).
+Default inputs: 1,000 AVAX, 6.50% gross APR, 365 days, and a 2% validator fee.
+Default output: 65 AVAX gross rewards, 1.30 AVAX validator fee, 63.70 AVAX net rewards, and 1,063.70 AVAX total at maturity.
+Network transaction costs are paid separately. Calculations use simple interest. Native staking rewards are paid at term end, subject to validator reward eligibility.
 
-### 1. Asset Delegation & Staking
-Connect a Web3 EVM wallet, select the desired asset or validator pool, authorize token allowance if required, and execute the staking transaction. Yield begins accumulating immediately.
+## Native staking parameters
+- Network: Avalanche P-Chain.
+- Delegation: minimum 25 AVAX, term of 14 days to one year.
+- Validation: minimum 2,000 AVAX, term of 48 hours to one year.
+- Validator reward fee: minimum 2% of earned rewards.
+- Staked tokens remain locked until the confirmed end date.
+- Reward uptime threshold: 90% for validations beginning from Helicon activation on September 22, 2026; 80% for earlier validations.
+- Primary Network staking has no stake slashing. Missing the uptime threshold can result in zero rewards.
 
-### 2. Unstaking & Liquidity Redemption
-Redeem staked assets or trade liquid receipt tokens (LSTs) directly on secondary markets without waiting for unbonding periods.
-
-### 3. Essential Gas Fuel Warning
-Maintain sufficient native gas tokens in your wallet to cover staking approvals, reward compounding, and unstaking claims.
-
-## Safety, Audits & Anti-Phishing
-- **Smart Contract Security**: Verified smart contract code published on block explorers.
-- **Anti-Phishing Protocol**: Always verify domain authenticity and check contract approval targets prior to signing Web3 transactions.
-
-## Frequently Asked Questions (FAQ)
-
-### What fees are charged by Avax Staking?
-There is zero protocol fee (0.00%). Users pay standard network execution gas.
-
-### Is Avax Staking non-custodial?
-Yes, you maintain 100% control of your private keys and assets at all times.
-
-## Internal Sections & App Navigation
-- [What is Avax Staking?](#what)
-- [How it works](#how)
-- [Your options & rewards](#options)
-- [Safety & Audits](#safety)
-- [Troubleshooting & Fixes](#troubleshoot)
-- [Frequently Asked Questions](#faq)
-- [Avax Staking Dashboard](index.html)
-- [Open Avax Staking App](dashboard/index.html)
+## Calculation example
+At 6.50% gross APR and a 2% validator reward fee, 100 AVAX earns 6.37 AVAX over 365 days. Changing the term or rate changes the result. Native rewards can be restaked after payout.

@@ -1,640 +1,90 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Avax Staking — Dashboard</title>
-<meta content="Avax Staking compared: native P-Chain delegation, running a validator, and sAVAX liquid staking — how rewards, lock-ups, and withdrawals actually work." name="description"/>
-<meta content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" name="robots"/>
-<meta content="#f5f6f8" name="theme-color"/>
-<link href="https://avax-staking.github.io/" rel="canonical"/>
-<link href="avax.png" rel="icon" type="image/png"/>
-<link href="avax.png" rel="apple-touch-icon"/>
-<link href="manifest.webmanifest" rel="manifest"/>
-<link href="og-cover.png" rel="image_src"/>
-<link crossorigin="" href="https://api.coingecko.com" rel="preconnect"/>
-<style>
-/* Avax Staking — independent single-page hub. */
-:root {
-  color-scheme: light;
-  --bg: #f5f6f8; --surface: #ffffff; --panel: #ffffff; --raised: #f1f3f6;
-  --line: rgba(17, 24, 39, 0.10); --line-2: rgba(17, 24, 39, 0.16);
-  --ink: #0e1016; --text: #464d59; --muted: #6a7280; --faint: #98a0ad;
-  --accent: #3d5de6; --accent-2: #2c45c8; --accent-soft: rgba(61, 93, 230, 0.10); --accent-glow: rgba(61, 93, 230, 0.22);
-  --cyan: #0e93a8; --cta: #3d5de6; --cta-ink: #ffffff;
-  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, "Roboto Mono", Menlo, Consolas, monospace;
-  --font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --ease: cubic-bezier(0.22, 0.7, 0.24, 1);
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body {
-  margin: 0; min-width: 320px;
-  color: var(--text); background: var(--bg);
-  font-family: var(--font); font-size: 15px; line-height: 1.55;
-  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
-}
-a { color: inherit; text-decoration: none; }
-a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; border-radius: 8px; }
-img { display: block; max-width: 100%; }
-.skip { position: absolute; left: -999px; }
-.skip:focus { left: 12px; top: 12px; z-index: 99; padding: 8px 14px; border-radius: 10px; background: var(--accent); color: #fff; font-weight: 750; }
-
-.shell { display: flex; min-height: 100dvh; }
-
-/* ───────── sidebar (off-canvas drawer) ───────── */
-.sidebar {
-  position: fixed; top: 0; left: 0; z-index: 70;
-  width: min(288px, 86vw); height: 100vh; height: 100dvh; overflow-y: auto;
-  display: flex; flex-direction: column; padding: 16px 12px 14px;
-  background: var(--surface); border-right: 1px solid var(--line);
-  transform: translateX(-100%); transition: transform 0.24s var(--ease);
-  box-shadow: 24px 0 70px rgba(17, 24, 39, 0.15);
-}
-.sidebar.is-open { transform: none; }
-.scrim { position: fixed; inset: 0; z-index: 65; background: rgba(17, 24, 39, 0.30); opacity: 0; pointer-events: none; transition: opacity 0.24s var(--ease); }
-.scrim.is-open { opacity: 1; pointer-events: auto; }
-html:not(.js) .sidebar { position: static; transform: none; width: 262px; height: auto; box-shadow: none; }
-html:not(.js) .scrim, html:not(.js) .nav-toggle { display: none; }
-.side-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 2px 8px 6px; }
-.brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
-.brand-logo { width: 32px; height: 32px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line-2); }
-.brand-logo img { width: 20px; height: 20px; border-radius: 6px; }
-.brand-name { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; }
-.nav-label { margin: 14px 12px 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--faint); }
-.nav-item { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 9px; color: var(--text); font-size: 14px; font-weight: 600; transition: color 150ms var(--ease), background-color 150ms var(--ease); }
-.ni-ico { width: 18px; height: 18px; flex: 0 0 auto; color: var(--muted); }
-.ni-ext { margin-left: auto; color: var(--faint); font-size: 12px; }
-.nav-item:hover { color: var(--ink); background: rgba(17, 24, 39, 0.04); }
-.nav-item:hover .ni-ico { color: var(--text); }
-.nav-item.is-active { color: var(--accent-2); background: transparent; }
-.nav-item.is-active .ni-ico { color: var(--accent-2); }
-.nav-group { border-radius: 9px; }
-.nav-group summary { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 9px; color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer; list-style: none; transition: color 150ms var(--ease), background-color 150ms var(--ease); }
-.nav-group summary::-webkit-details-marker { display: none; }
-.nav-group summary .ni-ico { color: var(--muted); }
-.nav-group summary .chev { width: 15px; height: 15px; margin-left: auto; color: var(--faint); transition: transform 200ms var(--ease); }
-.nav-group summary:hover { color: var(--ink); background: rgba(17, 24, 39, 0.04); }
-.nav-group[open] summary { color: var(--ink); }
-.nav-group[open] summary .ni-ico { color: var(--text); }
-.nav-group[open] summary .chev { transform: rotate(180deg); }
-@media (prefers-reduced-motion: reduce) { .nav-group summary .chev { transition: none; } }
-.nav-sub { display: flex; flex-direction: column; gap: 1px; padding: 2px 0 8px 42px; }
-.nav-sub a { display: flex; align-items: baseline; gap: 7px; padding: 6px 10px; border-radius: 8px; color: var(--muted); font-size: 12.5px; font-weight: 550; transition: color 150ms var(--ease), background-color 150ms var(--ease); }
-.nav-sub a small { color: var(--faint); font-size: 10.5px; font-weight: 500; }
-.nav-sub a:hover { color: var(--accent-2); background: rgba(17, 24, 39, 0.04); }
-.nav-sub a:hover small { color: var(--muted); }
-.sidebar-foot { margin-top: auto; padding-top: 13px; border-top: 1px solid var(--line); }
-.disclose { margin: 8px 10px 0; font-size: 11px; line-height: 1.5; color: var(--muted); }
-.disclose strong { color: var(--text); font-weight: 700; }
-.fine { margin: 6px 10px 0; font-size: 10.5px; line-height: 1.45; color: var(--faint); }
-.nav-toggle { display: inline-flex; width: 38px; height: 38px; flex: 0 0 auto; position: relative; padding: 0; border: 1px solid var(--line-2); border-radius: 10px; background: var(--raised); color: var(--ink); cursor: pointer; }
-.nav-toggle .bar { position: absolute; left: 10px; right: 10px; height: 2px; border-radius: 2px; background: currentColor; transition: transform 0.22s var(--ease), opacity 0.18s var(--ease); }
-.nav-toggle .bar:nth-child(1) { top: 13px; } .nav-toggle .bar:nth-child(2) { top: 18px; } .nav-toggle .bar:nth-child(3) { top: 23px; }
-.sidebar.is-open .nav-toggle .bar:nth-child(1) { transform: translateY(5px) rotate(45deg); }
-.sidebar.is-open .nav-toggle .bar:nth-child(2) { opacity: 0; }
-.sidebar.is-open .nav-toggle .bar:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
-
-/* persistent header: hamburger + logo + H1 */
-.topbar-left { display: flex; align-items: center; gap: 12px 14px; min-width: 0; flex-wrap: wrap; }
-.menu-btn { display: inline-flex; flex-direction: column; justify-content: center; gap: 4px; width: 40px; height: 38px; flex: 0 0 auto; padding: 0 9px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--raised); color: var(--ink); cursor: pointer; }
-.menu-btn .bar { display: block; height: 2px; width: 100%; border-radius: 2px; background: currentColor; transition: transform 0.22s var(--ease), opacity 0.18s var(--ease); }
-.menu-btn:hover { border-color: var(--accent); color: var(--accent-2); }
-.shell.nav-open .menu-btn .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.shell.nav-open .menu-btn .bar:nth-child(2) { opacity: 0; }
-.shell.nav-open .menu-btn .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
-.topbar-logo { width: 32px; height: 32px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line-2); }
-.topbar-logo img { width: 20px; height: 20px; border-radius: 6px; }
-h1.wordmark { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; white-space: nowrap; }
-html:not(.js) .menu-btn { display: none; }
-
-/* ───────── main / topbar ───────── */
-.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.topbar { position: relative; z-index: 40; flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; padding: 14px 26px; border-bottom: 0; background: transparent; }
-.topbar-right { display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; }
-.mode-switch { display: inline-flex; align-items: center; gap: 10px; }
-.ms-label { font-size: 13.5px; font-weight: 700; color: var(--muted); transition: color 150ms var(--ease); }
-.ms-label.is-on { color: var(--ink); }
-.ms-track { position: relative; width: 42px; height: 24px; flex: 0 0 auto; padding: 0; border: 1px solid var(--line-2); border-radius: 999px; background: var(--raised); cursor: pointer; transition: background-color 180ms var(--ease); }
-.ms-knob { position: absolute; top: 50%; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); transform: translateY(-50%); transition: left 200ms var(--ease); }
-.ms-track[aria-checked="true"] { background: var(--accent-soft); border-color: rgba(61, 93, 230, 0.4); }
-.ms-track[aria-checked="true"] .ms-knob { left: 23px; background: var(--accent-2); }
-.ticker { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 16px; min-width: 0; }
-.tick { display: inline-flex; align-items: baseline; gap: 6px; color: var(--faint); font-size: 11px; font-weight: 550; letter-spacing: 0.01em; transition: color 150ms var(--ease); }
-.tick b { color: var(--muted); font-family: var(--mono); font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.tick .ext { color: var(--faint); font-size: 9.5px; transition: color 150ms var(--ease); }
-.tick:hover { color: var(--muted); } .tick:hover b, .tick:hover .ext { color: var(--accent-2); }
-.btn-open { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid var(--line-2); border-radius: 10px; color: var(--ink); background: rgba(17, 24, 39, 0.04); font-size: 12.5px; font-weight: 700; white-space: nowrap; transition: border-color 150ms var(--ease), background-color 150ms var(--ease); }
-.btn-open:hover { border-color: var(--accent); color: var(--accent-2); }
-
-/* ───────── first screen: hero + swap card ───────── */
-.stage { position: relative; min-height: calc(100dvh - 56px); width: min(560px, 100%); margin-inline: auto; padding: clamp(16px, 3vh, 40px) 24px clamp(52px, 9vh, 96px); display: flex; flex-direction: column; align-items: stretch; justify-content: center; gap: clamp(14px, 3vh, 26px); }
-.hero { text-align: center; margin: 0; }
-.hero-h2 { margin: 0; font-size: clamp(1.5rem, 3.6vw, 2.1rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.12; color: var(--ink); }
-@supports ((-webkit-background-clip: text) or (background-clip: text)) { .hero-h2 { background: linear-gradient(180deg, #0e1016, #3a4c85); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; } }
-.hero-sub { margin: 10px auto 0; max-width: 48ch; font-size: 13.5px; line-height: 1.55; color: var(--text); }
-.hero-sub strong { color: var(--ink); font-weight: 700; }
-.swap-card { border: 1px solid var(--line-2); border-radius: var(--r-xl); background: var(--panel); padding: 16px; }
-.card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 2px; }
-.card-title { margin: 0; font-size: 11.5px; font-weight: 750; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
-.preview-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--line-2); border-radius: 999px; color: var(--accent-2); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-.preview-tag > span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.leg { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 15px 16px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); }
-.asset { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px 6px 6px; border: 1px solid var(--line-2); border-radius: 999px; background: rgba(17, 24, 39, 0.04); color: var(--ink); font-size: 14px; font-weight: 700; }
-.asset .tok { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: #fff; }
-.asset .tok img { width: 26px; height: 26px; }
-.asset .chev-sm { width: 15px; height: 15px; color: var(--muted); }
-.leg-amt { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; min-width: 0; }
-.leg-amt .amount { font-family: var(--mono); font-size: 1.7rem; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1; }
-.leg-amt .leg-sub { font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
-.swap-arrow { position: relative; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; margin: -12px auto; border: 3px solid var(--panel); border-radius: 12px; background: var(--raised); color: var(--accent-2); cursor: pointer; box-shadow: 0 0 0 1px var(--line-2); transition: transform 220ms var(--ease), color 150ms var(--ease); }
-.swap-arrow svg { width: 17px; height: 17px; }
-.swap-arrow:hover { color: #fff; transform: rotate(180deg); }
-.route-panel { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding: 13px 15px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--raised); }
-.route-info b { display: block; color: var(--ink); font-size: 13.5px; font-weight: 700; letter-spacing: 0.01em; }
-.route-info span { display: block; margin-top: 2px; color: var(--faint); font-size: 11.5px; }
-.route-tok { display: inline-flex; align-items: center; gap: 7px; color: var(--text); font-size: 13px; font-weight: 650; white-space: nowrap; }
-.route-tok .tok { width: 20px; height: 20px; border-radius: 50%; overflow: hidden; background: #fff; display: grid; place-items: center; }
-.route-tok .tok img { width: 20px; height: 20px; }
-.route-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 4px 2px; border-top: 1px solid var(--line); margin-top: 10px; }
-.route-row span { font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--faint); }
-.route-row b { color: var(--text); font-size: 12.5px; font-weight: 650; font-variant-numeric: tabular-nums; }
-.swap-cta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 15px; border-radius: var(--r-md); color: var(--cta-ink); background: var(--cta); font-size: 15px; font-weight: 750; letter-spacing: 0.01em; transition: filter 150ms var(--ease), transform 150ms var(--ease); }
-.swap-cta:hover { filter: brightness(1.04); transform: translateY(-1px); }
-/* scroll cue at the foot of the first screen */
-.scroll-cue { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; }
-.scroll-cue a { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; color: var(--faint); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
-.scroll-cue a:hover { color: var(--accent-2); }
-.scroll-cue svg { width: 16px; height: 16px; animation: cue 1.8s var(--ease) infinite; }
-@keyframes cue { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
-@media (prefers-reduced-motion: reduce) { .scroll-cue svg { animation: none; } }
-
-/* ───────── merged content (all in initial HTML; revealed on scroll) ───────── */
-.content { width: min(760px, 100%); margin: 0 auto; padding: clamp(56px, 12vh, 140px) 24px 88px; }
-.content .lead-in { padding: clamp(4px, 1vh, 12px) 0 clamp(10px, 2.5vh, 22px); }
-.content .lead-in > p { margin: 0 0 16px; font-size: 15px; line-height: 1.66; color: var(--text); }
-.content .lead-in > p strong { color: var(--ink); font-weight: 700; }
-/* premium feature card (modern-site feel) */
-.content .lead-in .feat{position:relative;width:min(1120px,calc(100vw - 44px));margin-left:50%;transform:translateX(-50%);display:grid;grid-template-columns:1.08fr .92fr;align-items:stretch;background:linear-gradient(165deg,#141824,#0b0e15);border:1px solid rgba(255,255,255,.09);border-radius:28px;overflow:hidden;box-shadow:0 52px 120px -55px rgba(0,0,0,.82)}
-.feat-l{padding:clamp(32px,4vw,64px);display:flex;flex-direction:column;justify-content:center}
-.feat-l h2{margin:0;font-size:clamp(2.2rem,4.6vw,3.2rem);line-height:1.03;font-weight:800;letter-spacing:-.03em;color:#fff}
-.feat-lead{margin:20px 0 0;font-size:17px;line-height:1.6;color:rgba(255,255,255,.9);max-width:48ch}
-.content .lead-in .feat-lead a{color:#fff;text-decoration:underline;text-decoration-color:rgba(255,255,255,.55);text-underline-offset:3px}
-.content .lead-in .feat-lead a:hover{text-decoration-color:#fff}
-.feat-cta{margin:32px 0 0}
-.content .lead-in .feat-btn{display:inline-flex;align-items:center;gap:10px;padding:17px 38px;border-radius:999px;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 50%,#7c4dff));color:#fff;font-weight:750;font-size:16.5px;text-decoration:none;box-shadow:0 20px 44px -12px var(--accent-glow);transition:transform .16s var(--ease),box-shadow .16s var(--ease)}
-.content .lead-in .feat-btn:hover{transform:translateY(-2px);box-shadow:0 26px 56px -14px var(--accent-glow)}
-.feat-btn .arr{transition:transform .18s var(--ease)}
-.content .lead-in .feat-btn:hover .arr{transform:translateX(3px)}
-.feat-more{margin:18px 0 0}
-.feat-readmore{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;color:rgba(255,255,255,.7);transition:color .15s var(--ease)}
-.feat-readmore::-webkit-details-marker{display:none}
-.feat-readmore:hover{color:#fff}
-.feat-readmore .chev{width:15px;height:15px;transition:transform .2s var(--ease)}
-.feat-more[open] .feat-readmore .chev{transform:rotate(180deg)}
-.feat-detail{margin:20px 0 0;font-size:14.5px;line-height:1.72;color:rgba(255,255,255,.82)}
-.content .lead-in .feat-detail a{color:#fff;text-decoration:underline;text-decoration-color:rgba(255,255,255,.55);text-underline-offset:3px}
-.feat-more:not([open]) .feat-detail{display:none}
-.content .lead-in .feat-lead{color:rgba(255,255,255,.9)}
-.content .lead-in .feat-detail,.content .lead-in .feat-detail p{color:rgba(255,255,255,.82)}
-.feat-facts{display:grid;grid-template-columns:1fr 1fr;gap:0 26px;margin:18px 0 2px}
-.feat-fact{padding:10px 0;border-top:1px solid rgba(255,255,255,.1)}
-.feat-fact .fl{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.5);margin:0 0 3px}
-.feat-fact .fv{display:block;font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.88)}
-.feat-r{position:relative;overflow:hidden;min-height:clamp(300px,32vw,440px);background:radial-gradient(120% 105% at 70% 22%,color-mix(in srgb,var(--accent) 52%,#1a1030),#0a0d14 70%)}
-.feat-r::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:36px 36px;-webkit-mask:radial-gradient(70% 72% at 64% 36%,#000,transparent 76%);mask:radial-gradient(70% 72% at 64% 36%,#000,transparent 76%)}
-.feat-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;width:clamp(122px,16vw,166px);height:clamp(122px,16vw,166px);border-radius:34px;display:grid;place-items:center;background:linear-gradient(160deg,rgba(255,255,255,.18),rgba(255,255,255,.02));box-shadow:0 38px 84px -22px var(--accent-glow),inset 0 0 0 1px rgba(255,255,255,.18)}
-.feat-badge img{width:52%;height:52%;object-fit:contain}
-@media (max-width:860px){
-  .content .lead-in .feat{width:calc(100vw - 28px);grid-template-columns:1fr}
-  .feat-l{padding:30px 22px 32px}
-  .feat-r{min-height:200px}
-  .feat-facts{grid-template-columns:1fr}
-}
-
-.tbl.spec table { min-width: 0; }
-.tbl.spec td:first-child { color: var(--muted); font-weight: 600; white-space: nowrap; width: 1%; }
-.content .sec { border-top: 1px solid var(--line); scroll-margin-top: 66px; }
-.content .sec:first-child { border-top: 0; }
-.content .sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: clamp(20px, 4vh, 32px) 0; }
-.content .sec > summary::-webkit-details-marker { display: none; }
-.content .sec > summary h2 { margin: 0; font-size: clamp(1.25rem, 2.8vw, 1.6rem); font-weight: 800; letter-spacing: -0.02em; color: var(--ink); transition: color 150ms var(--ease); }
-.content .sec > summary::after { content: "+"; flex: 0 0 auto; color: var(--accent); font-weight: 700; font-size: 1.5rem; line-height: 1; }
-.content .sec[open] > summary::after { content: "\2212"; }
-.content .sec > summary:hover h2 { color: var(--accent-2); }
-.content .sec-body { padding: 0 0 clamp(22px, 4vh, 34px); }
-.content .sec[open] .sec-body { animation: secdrop 0.22s var(--ease); }
-@keyframes secdrop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .content .sec[open] .sec-body { animation: none; } }
-.content p { margin: 0 0 13px; color: var(--text); }
-.content p strong, .content li strong { color: var(--ink); font-weight: 700; }
-.content ul, .content ol { margin: 0 0 14px; padding-left: 20px; }
-.content li { margin-bottom: 8px; color: var(--text); }
-.content li::marker { color: var(--accent); }
-/* inline source links — blend with the copy, brighten only on hover */
-.content .sec-body a, .content .qa .a a, .content .lead-in a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgba(17, 24, 39, 0.26); transition: color 150ms var(--ease), text-decoration-color 150ms var(--ease); }
-.content .sec-body a:hover, .content .qa .a a:hover, .content .lead-in a:hover { color: var(--accent-2); text-decoration-color: var(--accent-2); }
-.content .sec-body a.addr { text-decoration-color: rgba(134, 160, 255, 0.32); }
-.cite { margin: 4px 0 0; font-size: 12px; color: var(--faint); }
-.cite a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
-.cite a:hover { color: var(--accent-2); }
-.tbl { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); margin: 4px 0 14px; background: var(--panel); }
-.tbl table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 460px; }
-.tbl th { text-align: left; font-weight: 700; color: var(--accent-2); background: rgba(17, 24, 39, 0.04); padding: 10px 13px; border-bottom: 1px solid var(--line-2); font-size: 11.5px; letter-spacing: 0.02em; }
-.tbl td { padding: 10px 13px; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
-.tbl tr:last-child td { border-bottom: 0; }
-.tbl td:first-child { color: var(--ink); font-weight: 600; }
-.qa { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--panel); margin: 0 0 10px; overflow: hidden; }
-.qa summary { padding: 15px 18px; color: var(--ink); font-weight: 650; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 12px; font-size: 14.5px; }
-.qa summary::-webkit-details-marker { display: none; }
-.qa summary::after { content: "+"; color: var(--accent); font-weight: 700; font-size: 1.15rem; line-height: 1; }
-.qa[open] summary::after { content: "−"; }
-.qa[open] { border-color: var(--line-2); }
-.qa .a { padding: 0 18px 15px; color: var(--text); font-size: 13.5px; }
-.qa .a p { margin: 0 0 8px; }
-.addr { font-family: var(--mono); font-size: 12px; color: var(--accent-2); word-break: break-all; }
-.disclosure-box { margin: 24px 0 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); font-size: 12.5px; line-height: 1.6; color: var(--muted); }
-.disclosure-box strong { color: var(--text); }
-/* scroll-reveal — content is always present; JS only animates it in */
-html.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
-html.js .reveal.in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { html.js .reveal { opacity: 1; transform: none; transition: none; } }
-
-/* ───────── responsive ───────── */
-@media (max-width: 560px) {
-  .topbar { padding: 10px 16px; }
-  .stage { padding: 16px 16px 40px; }
-  .content { padding: clamp(40px, 9vh, 90px) 16px 72px; }
-  .ticker { display: none; }
-  .leg-amt .amount { font-size: 1.5rem; }
-}
-@media (max-height: 720px) and (min-width: 561px) {
-  .hero-h2 { font-size: clamp(1.35rem, 3.2vw, 1.9rem); }
-  .hero-sub { font-size: 13px; margin-top: 8px; }
-  .swap-card { padding: 13px; }
-  .leg { padding: 12px 14px; }
-  .leg-amt .amount { font-size: 1.45rem; }
-  .route-panel { margin-top: 9px; padding: 11px 14px; }
-  .swap-cta { margin-top: 12px; padding: 13px; }
-}
-.hero.stake-hero { text-align: center; max-width: 720px; margin: 0 auto; }
-.kicker { margin: 0 0 14px; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: 800; color: var(--accent); }
-.hero.stake-hero .hero-h2 { font-size: clamp(2rem, 5.2vw, 3.1rem); line-height: 1.08; }
-.hero.stake-hero .hero-sub { font-size: 15px; max-width: 54ch; margin-top: 14px; }
-.stake-gateway { margin: 36px auto 0; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.emblem { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(120% 120% at 30% 25%, #ffffff, #e8ecfb); box-shadow: 0 24px 60px -18px rgba(61,93,230,0.55), inset 0 0 0 1px rgba(61,93,230,0.12); position: relative; }
-.emblem::after { content: ""; position: absolute; inset: -16px; border-radius: 50%; background: radial-gradient(circle, rgba(61,93,230,0.20), transparent 70%); z-index: -1; }
-.emblem img { width: 52px; height: 52px; }
-.gw-facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
-.gw-chip { border: 1px solid var(--line-2); border-radius: 999px; padding: 7px 15px; font-size: 12.5px; font-weight: 600; color: var(--text); background: var(--panel); }
-.stake-cta { display: inline-flex; align-items: center; gap: 10px; padding: 15px 32px; border-radius: 14px; background: var(--cta); color: var(--cta-ink); font-weight: 800; font-size: 16px; text-decoration: none; box-shadow: 0 16px 38px -10px rgba(61,93,230,0.6); transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease); }
-.stake-cta:hover { transform: translateY(-2px); box-shadow: 0 22px 48px -12px rgba(61,93,230,0.72); }
-.stake-cta .cta-ico { width: 17px; height: 17px; flex: 0 0 auto; }
-.stake-cta .cta-go { transition: transform 0.18s var(--ease); }
-.stake-cta:hover .cta-go { transform: translateX(4px); }
-.cta-note { margin: 0; font-size: 11.5px; color: var(--faint); letter-spacing: 0.02em; }
-.stage { position: relative; }
-.stage::before { content: ""; position: absolute; top: -6%; left: 50%; transform: translateX(-50%); width: min(780px, 94vw); height: 440px; background: radial-gradient(60% 60% at 50% 38%, rgba(61,93,230,0.11), transparent 72%); z-index: 0; pointer-events: none; }
-.hero, .stake-gateway, .scroll-cue { position: relative; z-index: 1; }
-.field-notes { margin: clamp(28px,5vh,52px) 0 0; padding: 20px 22px; border: 1px solid var(--line-2); border-left: 3px solid var(--accent); border-radius: var(--r-md); background: var(--panel); }
-.field-notes h2 { margin: 0 0 12px; font-size: clamp(1.15rem,2.6vw,1.4rem); font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
-.field-notes .fn-body { color: var(--text); font-size: 14px; line-height: 1.66; }
-.field-notes .fn-body strong { color: var(--ink); font-weight: 700; }
-.field-notes .fn-body ul { margin: 8px 0 0; padding-left: 20px; }
-.field-notes .fn-body li { margin-bottom: 6px; }
-.content .sec { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); margin: 0 0 14px; scroll-margin-top: 80px; box-shadow: 0 1px 3px rgba(17,24,39,0.05); transition: box-shadow .24s var(--ease), border-color .24s var(--ease), transform .24s var(--ease); }
-.content .sec:hover { border-color: var(--line-2); box-shadow: 0 14px 34px -16px rgba(17,24,39,0.18); }
-.content .sec[open] { border-color: rgba(61,93,230,0.30); box-shadow: 0 18px 46px -18px rgba(61,93,230,0.24); }
-.content .sec > summary { padding: clamp(17px,2.6vh,24px) clamp(18px,3vw,26px); gap: 18px; border-radius: 16px; }
-.content .sec > summary h2 { font-size: clamp(1.12rem,2.5vw,1.4rem); }
-.content .sec > summary::after { content: ""; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--raised) no-repeat center; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%233d5de6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'); transition: transform .28s var(--ease), background-color .2s var(--ease), border-color .2s var(--ease); }
-.content .sec:hover > summary::after { border-color: var(--accent); }
-.content .sec[open] > summary::after { transform: rotate(180deg); background-color: var(--accent-soft); border-color: rgba(61,93,230,0.42); }
-.content .sec-body { padding: 0 clamp(18px,3vw,26px) clamp(20px,3vh,28px); }
-.content .sec-body > p:first-child, .content .sec-body > ul:first-child, .content .sec-body > ol:first-child { margin-top: 0; }
-.content #faq .qa { border-radius: 12px; margin: 0 0 10px; transition: border-color .2s var(--ease), box-shadow .2s var(--ease); }
-.content #faq .qa:hover { box-shadow: 0 8px 22px -12px rgba(17,24,39,0.14); }
-.content #faq .qa[open] { border-color: rgba(61,93,230,0.28); }
-/* ── stake hero (premium dark band, reference-grade) ── */
-.shero { position: relative; overflow: hidden; min-height: calc(100dvh - 48px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: clamp(48px,9vh,104px) 24px clamp(44px,7vh,84px); background: #0a0d15; color: #fff; border-bottom: 1px solid var(--line); }
-.shero::before { content:""; position:absolute; top:-18%; left:50%; transform:translateX(-50%); width:min(1100px,120vw); height:620px; background: radial-gradient(50% 55% at 50% 40%, var(--accent-glow), transparent 70%); opacity:.95; pointer-events:none; }
-.shero::after { content:""; position:absolute; inset:0; background-image: linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px,transparent 1px); background-size: 30px 30px; -webkit-mask: radial-gradient(80% 70% at 50% 30%, #000, transparent 75%); mask: radial-gradient(80% 70% at 50% 30%, #000, transparent 75%); pointer-events:none; }
-.shero-inner { position: relative; z-index: 2; width: 100%; max-width: 900px; }
-.shero-emblem { width: 76px; height: 76px; margin: 0 auto 26px; border-radius: 22px; display: grid; place-items: center; background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.03)); box-shadow: 0 24px 60px -18px var(--accent-glow), inset 0 0 0 1px rgba(255,255,255,.14); }
-.shero-emblem img { width: 42px; height: 42px; }
-.shero-kicker { margin: 0 0 15px; text-transform: uppercase; letter-spacing: .22em; font-size: 11px; font-weight: 800; color: var(--accent); }
-.shero-h { margin: 0; font-size: clamp(2.1rem,5.6vw,3.5rem); line-height: 1.05; font-weight: 850; letter-spacing: -.03em; color: #fff; }
-.shero-sub { margin: 16px auto 0; max-width: 56ch; font-size: 16px; line-height: 1.6; color: rgba(255,255,255,.66); }
-.shero-sub strong { color: #fff; font-weight: 700; }
-.shero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: center; margin: 30px 0 0; }
-.sbtn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 26px; border-radius: 13px; font-weight: 750; font-size: 15px; cursor: pointer; transition: transform .16s var(--ease), box-shadow .16s var(--ease), background-color .16s var(--ease), border-color .16s var(--ease); }
-.sbtn-primary { background: var(--accent); color: #fff; padding: 16px 34px; font-size: 16px; box-shadow: 0 16px 38px -12px var(--accent-glow); }
-.sbtn-primary:hover { transform: translateY(-2px); }
-.sbtn-primary .cta-go { transition: transform .18s var(--ease); }
-.sbtn-primary:hover .cta-go { transform: translateX(3px); }
-.sbtn-ghost { background: rgba(255,255,255,.05); color: #fff; padding: 11px 20px; font-size: 13.5px; border: 1px solid rgba(255,255,255,.17); }
-.sbtn-ghost:hover { border-color: rgba(255,255,255,.42); background: rgba(255,255,255,.09); }
-.shero-kpis { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 44px auto 0; max-width: 900px; }
-.kpi { flex: 1 1 168px; max-width: 240px; display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 11px 14px; text-align: left; }
-.kpi svg { width: 15px; height: 15px; color: var(--accent); flex: none; }
-.kpi span { font-size: 12.5px; font-weight: 650; color: rgba(255,255,255,.84); line-height: 1.3; }
-.shero .scroll-cue { position: absolute; left: 0; right: 0; bottom: 14px; z-index: 2; }
-.shero .scroll-cue a { color: rgba(255,255,255,.5); }
-.shero .scroll-cue a:hover { color: #fff; }
-@media (max-width: 720px) {
-  .shero { min-height: 0; padding: 46px 18px 40px; }
-  .shero-kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .shero .scroll-cue { display: none; }
-}
-/* docs layout (sticky TOC + open sections) */
-.docs{position:relative;width:min(1120px,calc(100vw - 44px));margin-left:50%;transform:translateX(-50%);display:grid;grid-template-columns:236px minmax(0,1fr);gap:clamp(28px,4vw,60px);margin-top:clamp(40px,6vh,72px);align-items:start}
-.toc{position:sticky;top:74px;align-self:start;max-height:calc(100dvh - 96px);overflow:auto}
-.toc-h{margin:0 0 10px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding-left:13px}
-.toc a{display:block;padding:7px 13px;border-left:2px solid var(--line);color:var(--muted);font-size:13px;font-weight:600;line-height:1.35;text-decoration:none;transition:color .15s var(--ease),border-color .15s var(--ease)}
-.toc a:hover{color:var(--ink)}
-.toc a.active{color:var(--accent-2);border-left-color:var(--accent);font-weight:750}
-.doc-main{min-width:0}
-.content .doc-sec{border:1px solid var(--line);border-radius:20px;background:var(--panel);box-shadow:0 1px 3px rgba(17,24,39,.04);margin:0 0 16px;padding:0;scroll-margin-top:82px;transition:box-shadow .26s var(--ease),border-color .26s var(--ease)}
-.content .doc-sec:first-child{border-top:1px solid var(--line)}
-.content .doc-sec:hover{border-color:var(--line-2);box-shadow:0 16px 40px -22px rgba(17,24,39,.18)}
-.content .doc-sec[open]{border-color:var(--line)}
-.content .doc-sec>summary{cursor:default;pointer-events:none;padding:clamp(20px,3vh,28px) clamp(22px,3.2vw,32px) 8px;list-style:none}
-.content .doc-sec>summary::-webkit-details-marker{display:none}
-.content .doc-sec>summary::after{display:none}
-.content .doc-sec>summary h2{font-size:clamp(1.2rem,2.3vw,1.5rem)}
-.content .doc-sec .sec-body{padding:0 clamp(22px,3.2vw,32px) clamp(22px,3.4vh,30px);max-width:74ch}
-.content .doc-sec.field-notes{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:20px;background:var(--panel);box-shadow:0 1px 3px rgba(17,24,39,.04);margin:0 0 16px;padding:clamp(22px,3vh,28px) clamp(22px,3.2vw,32px)}
-.content .doc-sec.field-notes h2{font-size:clamp(1.2rem,2.3vw,1.5rem)}
-.content .doc-sec.field-notes .fn-body{max-width:74ch}
-@media (max-width:900px){
-  .docs{grid-template-columns:1fr;width:calc(100vw - 28px);gap:0}
-  .toc{position:sticky;top:56px;z-index:20;display:flex;gap:8px;overflow-x:auto;max-height:none;background:var(--bg);padding:11px 2px;margin:0 0 6px;border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch}
-  .toc-h{display:none}
-  .toc a{flex:0 0 auto;white-space:nowrap;border-left:0;border:1px solid var(--line);border-radius:999px;padding:8px 15px;font-size:12.5px}
-  .toc a.active{color:var(--accent-2);border-color:var(--accent);background:var(--accent-soft)}
-}
-.site-foot{width:min(1120px,calc(100vw - 44px));margin:clamp(34px,5vh,60px) auto 0;padding:22px 2px clamp(30px,4vh,48px);color:var(--faint);font-size:12.5px;line-height:1.6}
-.site-foot p{margin:0 0 6px;max-width:82ch}
-.site-foot strong{color:var(--muted);font-weight:700}
-.site-foot .foot-fine{font-size:11.5px}
-  </style>
-<meta content="website" property="og:type"/><meta content="https://avax-staking.github.io/" property="og:url"/>
-<meta content="Avax Staking — Dashboard" property="og:title"/>
-<meta content="Avax Staking compared: native P-Chain delegation, running a validator, and sAVAX liquid staking — how rewards, lock-ups, and withdrawals actually work." property="og:description"/>
-<meta content="Avax Staking" property="og:site_name"/><meta content="https://avax-staking.github.io/og-cover.png" property="og:image"/>
-<meta content="1200" property="og:image:width"/><meta content="630" property="og:image:height"/><meta content="Avax Staking — independent staking dashboard" property="og:image:alt"/>
-<meta content="summary_large_image" name="twitter:card"/><meta content="Avax Staking — Dashboard" name="twitter:title"/>
-<meta content="Avax Staking compared: native P-Chain delegation, running a validator, and sAVAX liquid staking — how rewards, lock-ups, and withdrawals actually work." name="twitter:description"/><meta content="https://avax-staking.github.io/og-cover.png" name="twitter:image"/>
-<script type="application/ld+json">
-  {"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://avax-staking.github.io/#website", "url": "https://avax-staking.github.io/", "name": "Avax Staking", "inLanguage": "en"}, {"@type": "Thing", "@id": "https://avax-staking.github.io/#brand", "name": "Avax Staking", "alternateName": ["Avax staking"], "description": "Avax Staking — how it works, rewards, risks, and how to stake, on an independent non-custodial dashboard.", "sameAs": ["https://en.wikipedia.org/wiki/Avalanche_(blockchain_platform)", "https://docs.avascan.info/guide-delegation-avalanche-network/choose-validator-node-avalanche"]}, {"@type": "WebPage", "@id": "https://avax-staking.github.io/#webpage", "url": "https://avax-staking.github.io/", "name": "Avax Staking — Dashboard", "description": "Avax Staking compared: native P-Chain delegation, running a validator, and sAVAX liquid staking — how rewards, lock-ups, and withdrawals actually work.", "isPartOf": {"@id": "https://avax-staking.github.io/#website"}, "about": {"@id": "https://avax-staking.github.io/#brand"}, "mainEntity": {"@id": "https://avax-staking.github.io/#brand"}, "inLanguage": "en", "dateModified": "2026-07-21"}, {"@type": "FAQPage", "@id": "https://avax-staking.github.io/#faq", "mainEntity": [{"@type": "Question", "name": "Is AVAX staking safe?", "acceptedAnswer": {"@type": "Answer", "text": "No staking is risk-free, but native AVAX staking removes one major risk: there is no protocol slashing, so validator failure costs rewards, not principal. What remains is real — lock-ups you cannot exit early, AVAX price swings, validator underperformance below the 80% uptime bar, and wallet compromise; liquid staking adds smart-contract and sAVAX depeg risk. The official staking FAQ covers the mechanics in detail."}}, {"@type": "Question", "name": "How are staking rewards and APY determined?", "acceptedAnswer": {"@type": "Answer", "text": "Rewards are variable and protocol-set — there is no fixed or guaranteed rate. Native rewards depend on stake size, term length, and validator uptime, minus the validator's delegation fee; sAVAX rewards accrue in the token's exchange rate against AVAX. Check the live rate in the wallet or protocol app before you commit."}}, {"@type": "Question", "name": "How much AVAX do I need to start?", "acceptedAnswer": {"@type": "Answer", "text": "Native delegation requires at least 25 AVAX; running your own validator requires at least 2,000 AVAX. Liquid-staking minimums are set by each protocol rather than the network and are shown in its app."}}, {"@type": "Question", "name": "How do I unstake, and how long does it take?", "acceptedAnswer": {"@type": "Answer", "text": "Native stakes end only at the term you chose — between 14 days and one year — with no early exit; principal and rewards then return automatically to your designated addresses. With sAVAX, you redeem through the protocol's withdrawal process or sell on a C-Chain market, where speed depends on liquidity."}}, {"@type": "Question", "name": "What are the main staking options?", "acceptedAnswer": {"@type": "Answer", "text": "Three: run a validator (2,000 AVAX minimum, infrastructure required), delegate to an existing validator (25 AVAX minimum, keys stay with you), or use a liquid-staking protocol that issues sAVAX (transferable and DeFi-usable, but with smart-contract and depeg risk)."}}, {"@type": "Question", "name": "Is this the official Avalanche site?", "acceptedAnswer": {"@type": "Answer", "text": "No. This is an independent, informational dashboard that compares staking routes and terms — it does not hold funds, sign transactions, or represent Avalanche. Confirm all terms in the official wallet or protocol app before staking."}}]}]}
-  </script>
-<link href="dashboard/index.html" rel="prefetch"/><link href="dashboard/index.html" rel="prerender"/></head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avax Staking | Calculate AVAX Rewards After Fees</title>
+<meta name="description" content="Calculate your Avax Staking rewards in AVAX. Compare staking periods, adjust APR and validator fees, and see your annual income from a 25 AVAX minimum.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#faf9f7">
+<link rel="canonical" href="https://avax-staking.github.io/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Avax Staking | Calculate AVAX Rewards After Fees">
+<meta property="og:description" content="Your stake. Your term. Your AVAX rewards. Calculate annual income, compare durations, and see the effect of validator fees.">
+<meta property="og:url" content="https://avax-staking.github.io/">
+<meta property="og:image" content="https://avax-staking.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Avax Staking rewards calculator with annual AVAX income and validator fees">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Avax Staking | Calculate AVAX Rewards After Fees">
+<meta name="twitter:description" content="Calculate AVAX rewards, compare staking terms, and see your annual income after validator fees.">
+<meta name="twitter:image" content="https://avax-staking.github.io/og.png">
+<meta name="twitter:image:alt" content="Avax Staking rewards calculator with annual AVAX income and validator fees">
+<script src="assets/calculator.js" defer></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://avax-staking.github.io/#website", "url": "https://avax-staking.github.io/", "name": "Website", "inLanguage": "en"}, {"@type": "WebPage", "@id": "https://avax-staking.github.io/#webpage", "url": "https://avax-staking.github.io/", "name": "Avax Staking | Calculate AVAX Rewards After Fees", "description": "Calculate AVAX staking rewards by amount, APR, duration, and validator reward fee.", "isPartOf": {"@id": "https://avax-staking.github.io/#website"}, "breadcrumb": {"@id": "https://avax-staking.github.io/#breadcrumb"}, "mainEntity": {"@id": "https://avax-staking.github.io/#calculator"}, "hasPart": {"@id": "https://avax-staking.github.io/#faq"}, "inLanguage": "en", "primaryImageOfPage": {"@type": "ImageObject", "url": "https://avax-staking.github.io/og.png", "width": 1200, "height": 630}}, {"@type": "SoftwareApplication", "@id": "https://avax-staking.github.io/#calculator", "name": "Avax Staking Rewards Calculator", "url": "https://avax-staking.github.io/#calculator", "applicationCategory": "FinanceApplication", "operatingSystem": "Any", "browserRequirements": "Requires JavaScript for interactive calculations.", "description": "Calculate simple-interest AVAX staking rewards after validator fees using an amount, annual percentage rate, and staking duration.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "featureList": ["AVAX annual rewards calculation", "Staking duration comparison", "Validator reward fee calculation"], "inLanguage": "en"}, {"@type": "BreadcrumbList", "@id": "https://avax-staking.github.io/#breadcrumb", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Avax Staking", "item": "https://avax-staking.github.io/"}]}, {"@type": "FAQPage", "@id": "https://avax-staking.github.io/#faq", "url": "https://avax-staking.github.io/#faq", "isPartOf": {"@id": "https://avax-staking.github.io/#webpage"}, "name": "Avax Staking FAQ", "inLanguage": "en", "mainEntity": [{"@type": "Question", "name": "What is the minimum amount for Avax Staking?", "acceptedAnswer": {"@type": "Answer", "text": "Native delegation starts at 25 AVAX. Running a Primary Network validator requires 2,000 AVAX. Keep additional AVAX available for transaction fees."}}, {"@type": "Question", "name": "How much can I earn staking 1,000 AVAX?", "acceptedAnswer": {"@type": "Answer", "text": "At a gross APR of 6.50% and a 2% validator fee, 1,000 AVAX produces 65 AVAX in gross annual rewards. The validator fee is 1.30 AVAX, leaving 63.70 AVAX in annual rewards before network transaction costs. Change the APR and fee in the calculator to compare returns."}}, {"@type": "Question", "name": "When are AVAX staking rewards paid?", "acceptedAnswer": {"@type": "Answer", "text": "Native delegation rewards are paid at the end of the delegation term when the validator meets the reward requirements. The staked AVAX returns at maturity. Annualized income expresses a yearly rate; the payout follows your chosen end date."}}, {"@type": "Question", "name": "Can I withdraw AVAX before my staking term ends?", "acceptedAnswer": {"@type": "Answer", "text": "Native AVAX stays locked until the end date confirmed in the staking transaction. Choose a term that matches when you need access to your tokens. Liquid staking follows the withdrawal and redemption rules of the protocol you select."}}, {"@type": "Question", "name": "What is the difference between AVAX staking APR and APY?", "acceptedAnswer": {"@type": "Answer", "text": "APR expresses annual rewards without reinvestment. APY includes the effect of compounding. Native AVAX rewards arrive at the end of a term; earning rewards on those rewards requires staking them again. This calculator uses APR and simple interest."}}, {"@type": "Question", "name": "Which chain is used for native AVAX staking?", "acceptedAnswer": {"@type": "Answer", "text": "Native staking uses the Avalanche P-Chain. Move AVAX from the C-Chain to the P-Chain with a cross-chain transfer before delegating. Keep enough AVAX available for the export, import, and staking transaction fees."}}, {"@type": "Question", "name": "How do validator fees affect my AVAX rewards?", "acceptedAnswer": {"@type": "Answer", "text": "The delegation fee is a percentage of the reward. A 2% fee on 65 AVAX in gross rewards is 1.30 AVAX, leaving 63.70 AVAX. The stake amount stays separate from this reward fee. Network transaction fees are additional."}}, {"@type": "Question", "name": "How do I choose a validator for AVAX staking?", "acceptedAnswer": {"@type": "Answer", "text": "Compare observed uptime, fee, available delegation capacity, and staking end date. Your entire delegation must fit within the validator's active term. The reward uptime threshold is 90% for validations starting at or after the September 22, 2026 Helicon activation; earlier validations retain the 80% threshold."}}]}]}</script>
+</head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-<div class="shell">
-<main class="main" id="main">
-<header class="topbar">
-<div class="topbar-left">
-<h1 class="wordmark">Avax Staking</h1>
-</div>
-<div class="topbar-right"><div aria-label="Live metrics" class="ticker">
-<a aria-label="Avax" class="tick" href="https://www.coingecko.com/en/coins/avalanche-2" rel="noopener noreferrer" target="_blank"><span>Avax</span> <b id="sig-avalanche-2">…</b> <span aria-hidden="true" class="ext">↗</span></a>
-<a aria-label="Market cap" class="tick" href="https://coinmarketcap.com/currencies/avalanche-2/" rel="noopener noreferrer" target="_blank"><span>Market cap</span> <b id="sig-mc-avalanche-2">…</b> <span aria-hidden="true" class="ext">↗</span></a>
-<a aria-label="ETH" class="tick" href="https://defillama.com/" rel="noopener noreferrer" target="_blank"><span>ETH</span> <b id="sig-ethereum">…</b> <span aria-hidden="true" class="ext">↗</span></a>
-</div>
-</div>
+<a class="c0dd59e" href="#main">Skip to content</a>
+<header class="c68b679 c818508">
+  <div class="c186bd0"><img src="assets/tokens/avalanche.svg" width="28" height="28" alt="Avalanche"><span>Avax Staking</span></div>
+  <nav aria-label="Main navigation"><a href="#calculator">Calculator</a><a href="#how-it-works">How staking works</a><a href="#faq">FAQ</a></nav>
+  <a class="c913bae c937738" href="dashboard/">Open app <span class="ce53d06" aria-hidden="true">&#8599;</span></a>
 </header>
-<section class="shero" id="gateway">
-<div class="shero-inner">
-<div class="shero-emblem"><img alt="Avax staking asset on Avax Staking" height="42" src="avax.png" width="42"/></div>
-<p class="shero-kicker">Avalanche Network Staking</p>
-<h2 class="shero-h">Put Your AVAX to Work</h2>
-<p class="shero-sub"><strong>Avax Staking</strong> lets you lock AVAX to help secure Avalanche and earn protocol rewards — natively on the P-Chain or through liquid staking.</p>
-<div class="shero-cta">
-<a class="sbtn sbtn-primary" href="dashboard/" rel="noopener noreferrer" target="_blank">Open the staking app <span aria-hidden="true" class="cta-go">↗</span></a>
-<a class="sbtn sbtn-ghost" href="#what">Read the guide</a>
-</div>
-<div class="shero-kpis">
-<div class="kpi"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" viewbox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg><span>No protocol slashing</span></div>
-<div class="kpi"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" viewbox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg><span>25 AVAX to delegate</span></div>
-<div class="kpi"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" viewbox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg><span>14 days–1 year terms</span></div>
-</div>
-</div>
-<div class="scroll-cue"><a href="#what"><span>What is Avax Staking</span><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg></a></div>
-</section>
-<div class="content">
-<div class="lead-in reveal">
-<div class="feat">
-<div class="feat-l">
-<h2>Avax Staking Architecture &amp; Yield Overview</h2>
-<p class="feat-lead">There are two real ways to do Avax Staking: <a href="https://build.avax.network/docs/primary-network/validate/how-to-stake">native staking on Avalanche's P-Chain</a> — as a validator or delegator — or liquid staking through a protocol that issues sAVAX.</p>
-<div class="feat-cta"><a class="feat-btn" href="dashboard/" rel="noopener noreferrer" target="_blank">Enter Staking Dashboard <span aria-hidden="true" class="arr">→</span></a></div>
-<details class="feat-more">
-<summary class="feat-readmore">Read more <svg aria-hidden="true" class="chev" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg></summary>
-<div class="feat-detail">
-<p>Native delegation is non-custodial: you assign stake weight to a validator without handing over your keys, and the protocol returns principal and rewards automatically when the term ends. This page is an independent dashboard — it compares routes and live terms but never holds funds or signs transactions.</p>
-<div class="feat-facts">
-<div class="feat-fact"><span class="fl">Asset / network</span><span class="fv">AVAX on Avalanche Mainnet (network ID 1; C-Chain chain ID 43114)</span></div>
-<div class="feat-fact"><span class="fl">How it works</span><span class="fv">Validators lock AVAX on the P-Chain; delegators assign them stake weight; liquid protocols pool AVAX and issue sAVAX</span></div>
-<div class="feat-fact"><span class="fl">Rewards</span><span class="fv">Variable protocol rewards for uptime and correct validation — paid at term end natively, or via the sAVAX exchange rate</span></div>
-<div class="feat-fact"><span class="fl">Custody</span><span class="fv">Native delegation is non-custodial; liquid staking is smart-contract custody — verify each protocol</span></div>
-<div class="feat-fact"><span class="fl">Lock-up / exit</span><span class="fv">Native terms run 14 days to 1 year with no early exit; sAVAX redeems via the protocol's withdrawal process</span></div>
-<div class="feat-fact"><span class="fl">Verify</span><span class="fv">Validator uptime and delegation fee, term dates, token contract address, and who controls the keys</span></div>
-</div>
-</div>
-</details>
-</div>
-<div class="feat-r"><span class="feat-badge"><img alt="Avax Staking" height="72" src="avax.png" width="72"/></span></div>
-</div>
-</div>
-<div class="docs">
-<nav aria-label="On this page" class="toc">
-<p class="toc-h">On this page</p>
-<a href="#what">What is Avax Staking?</a>
-<a href="#how">How it works</a>
-<a href="#ways">Your options</a>
-<a href="#rewards">Rewards and APY</a>
-<a href="#risks">Risks and lock-up</a>
-<a href="#howto">How to start</a>
-<a href="#withdraw">Unstaking and withdrawals</a>
-<a href="#faq">Avax FAQ</a>
-<a href="#notes">Notes before you stake</a>
-</nav>
-<div class="doc-main">
-<details class="sec reveal doc-sec" id="what" open="">
-<summary><h2>What is Avax Staking?</h2></summary>
-<div class="sec-body"><p>AVAX staking locks AVAX to help secure Avalanche's Primary Network in a <a href="https://ethereum.org/developers/docs/consensus-mechanisms/pos/" rel="noopener noreferrer" target="_blank">proof-of-stake model</a>, with protocol rewards paid for that service. Native staking lives on the P-Chain, the platform chain that tracks validators and stake; its Bech32 addresses begin P-avax1, and you either run a validator node or delegate stake weight to one.</p><p>Liquid staking accepts AVAX on the C-Chain, pools it, delegates it on the P-Chain, and issues sAVAX as a transferable receipt token whose value reflects staking rewards while you hold or use it.</p></div>
-</details>
-<details class="sec reveal doc-sec" id="how" open="">
-<summary><h2>How it works</h2></summary>
-<div class="sec-body"><p>Native AVAX staking works by moving AVAX to the P-Chain, choosing validation or delegation, setting the amount and a term between 14 days and one year, designating return and reward addresses, and signing one P-Chain transaction; once live, the stake cannot be ended or modified early. An <a href="https://docs.avascan.info/guide-delegation-avalanche-network/guide-delegation-avax-web-wallet" rel="noopener noreferrer" target="_blank">Avalanche delegation guide</a> shows the transaction fields a delegator supplies.</p><p>Validators must keep their node online for at least 80% of the term for themselves and their delegators to earn rewards, and each validator sets a delegation fee with a protocol minimum of 2% deducted from delegator rewards. Avalanche native staking has no slashing: poor performance forfeits rewards, never principal. Rewards follow the protocol formula and are paid automatically with principal when the term ends. Liquid routes pool deposits and delegate them, while sAVAX accrues value through its exchange rate against AVAX.</p></div>
-</details>
-<details class="sec reveal doc-sec" id="ways" open="">
-<summary><h2>Your options</h2></summary>
-<div class="sec-body"><p>The three AVAX staking routes are running a validator, delegating to one, or using liquid staking.</p><ul><li><strong>Run a validator:</strong> stake at least 2,000 AVAX, operate your own node, and meet the 80% uptime requirement.</li><li><strong>Delegate:</strong> stake at least 25 AVAX without running infrastructure, choose a validator by NodeID, compare operators on the public validator list by uptime and fee, and keep your keys in your wallet.</li><li><strong>Liquid staking:</strong> deposit AVAX on the C-Chain and receive sAVAX, which remains transferable and usable in DeFi; each protocol sets its own minimum. A <a href="https://www.ledger.com/academy/topics/defi/what-is-liquid-staking" rel="noopener noreferrer" target="_blank">liquid-staking explainer</a> describes why the receipt token remains usable.</li></ul><p>The practical difference is operational control: validation means running the node, delegation means selecting the node, and liquid staking means receiving a transferable token from the protocol.</p></div>
-</details>
-<details class="sec reveal doc-sec" id="rewards" open="">
-<summary><h2>Rewards and APY</h2></summary>
-<div class="sec-body"><p>AVAX staking rewards are variable protocol rewards rather than a fixed rate: native rewards depend on the amount staked, the term length, and whether the validator met the 80% uptime requirement, while a validator's delegation fee with a 2% protocol minimum reduces delegator rewards. Native payout goes to the designated reward address with principal when the term ends.</p><p>sAVAX reflects rewards through its exchange rate against AVAX instead of a separate native payout; a public <a href="https://www.cfbenchmarks.com/data/indices/AVAX_SRR" rel="noopener noreferrer" target="_blank">AVAX staking reward reference rate</a> provides a benchmark for comparison.</p></div>
-</details>
-<details class="sec reveal doc-sec" id="risks" open="">
-<summary><h2>Risks and lock-up</h2></summary>
-<div class="sec-body"><p>AVAX staking risk comes from the lock-up, AVAX price movement, validator performance, wallet security, and liquid-staking counterparty exposure; Avalanche's native mechanism has no slashing.</p><p>Native terms run 14 days to one year with no early exit, and a validator below the 80% uptime bar forfeits rewards but not principal. A compromised wallet can defeat wallet-level protections, and AVAX price movement can outweigh staking returns. Liquid staking adds smart-contract and provider-operations risk, exit-liquidity constraints, and the possibility that sAVAX trades below its redemption value; compare the recorded <a href="https://docs.benqi.fi/resources/contracts/liquid-staking" rel="noopener noreferrer" target="_blank">sAVAX contract list</a> with the asset you intend to use.</p></div>
-</details>
-<details class="sec reveal doc-sec" id="howto" open="">
-<summary><h2>How to start</h2></summary>
-<div class="sec-body"><p>To start AVAX staking, choose a route, use a self-custody wallet with its seed phrase stored offline, and provide the required chain, stake, term, and reward-address details.</p><ol><li><strong>Delegate:</strong> move AVAX to the P-Chain, whose addresses start P-avax1; choose a validator by NodeID, set the amount, term, return address, and reward address, then sign. The minimum is 25 AVAX.</li><li><strong>Validate:</strong> run a node, stake at least 2,000 AVAX, and maintain 80% uptime for the full term.</li><li><strong>Liquid:</strong> connect a wallet on the C-Chain with chain ID 43114, deposit AVAX with the protocol, and receive sAVAX. The recorded sAVAX contract is 0x2b2C81e08f1Af8835a78Bb2A90AE924ACE0eA4bE.</li></ol></div>
-</details>
-<details class="sec reveal doc-sec" id="withdraw" open="">
-<summary><h2>Unstaking and withdrawals</h2></summary>
-<div class="sec-body"><p>Native AVAX staking ends automatically when the chosen term ends: principal and earned rewards return to the designated addresses with no claiming step and no queue, while the 14-day-to-one-year term has no early exit.</p><p>Liquid staking uses the protocol's withdrawal process for sAVAX, with its own timing, or a C-Chain market swap whose speed depends on available price and liquidity; the <a href="https://support.avax.network/en/articles/6930813-explorer-how-do-i-use-the-p-chain-explorer" rel="noopener noreferrer" target="_blank">P-Chain explorer</a> shows staking details, addresses, transaction history, positions, and term dates.</p></div>
-</details>
-<details class="sec reveal doc-sec" id="faq" open="">
-<summary><h2>Avax FAQ</h2></summary>
-<div class="sec-body">
-<details class="qa"><summary>Is AVAX staking safe?</summary><div class="a"><p>Native AVAX staking has no protocol slashing, so validator underperformance forfeits rewards rather than principal; the route-specific lock-up and custody details are covered in Risks and lock-up.</p></div></details>
-<details class="qa"><summary>How are staking rewards and APY determined?</summary><div class="a"><p>Rewards are variable and protocol-set: native rewards depend on stake size, term length, and validator uptime minus the validator's delegation fee, while sAVAX rewards appear through its exchange rate against AVAX.</p></div></details>
-<details class="qa"><summary>How much AVAX do I need to start?</summary><div class="a"><p>Native delegation requires at least 25 AVAX, running a validator requires at least 2,000 AVAX, and liquid-staking minimums are set by each protocol rather than the network.</p></div></details>
-<details class="qa"><summary>How do I unstake, and how long does it take?</summary><div class="a"><p>Native stakes end only at the chosen term between 14 days and one year, with principal and rewards returning automatically; sAVAX follows the protocol's withdrawal process or a C-Chain market's available liquidity.</p></div></details>
-<details class="qa"><summary>What are the main staking options?</summary><div class="a"><p>The options are running a validator with a 2,000 AVAX minimum, delegating with a 25 AVAX minimum, or using a liquid-staking protocol that issues transferable, DeFi-usable sAVAX.</p></div></details>
-<details class="qa"><summary>Is this the official Avalanche site?</summary><div class="a"><p>No. This is an independent informational dashboard that compares staking routes and terms; it does not hold funds, sign transactions, or represent Avalanche.</p></div></details>
-</div>
-</details>
-<section class="field-notes reveal doc-sec" id="notes">
-<h2>Notes before you stake</h2>
-<div class="fn-body"><p><strong>Choose the route that matches the control and liquidity you need.</strong> Native delegation keeps your keys and validator choice with you and ends on a fixed date; sAVAX keeps the receipt token transferable for DeFi use.</p><ul><li>Native delegation requires at least 25 AVAX; running a validator requires at least 2,000 AVAX.</li><li>Native terms run 14 days to one year with no early exit, and principal plus rewards return to the designated addresses at the end.</li><li>Liquid-staking minimums and withdrawal timing come from the protocol, while the token contract identifies the sAVAX asset.</li></ul><p>Everything above reflects the protocol rules and public documentation, last reviewed 21 July 2026. <strong>Independent reference — confirm terms in the official app before staking.</strong></p></div>
-</section>
-</div>
-</div>
-</div>
-<footer class="site-foot"><div class="wrap">Avax Staking Guide &amp; Technical Reference · <a href="dashboard/" rel="noopener noreferrer" target="_blank">Open Avax Staking App ↗</a> · © 2026</div></footer>
+<main class="c68b679" id="main">
+  <section class="c812717" aria-labelledby="page-title">
+    <h1 id="page-title">Avax Staking<span>.</span></h1>
+    <p class="cf56601"><strong>Avax Staking earns AVAX rewards by delegating tokens to an Avalanche validator.</strong> Enter your amount to calculate rewards after validator fees.</p>
+    <div class="cdca850" id="calculator">
+      <div class="c713f67"><h2>AVAX staking rewards calculator</h2><span class="c3417b1"><img src="assets/tokens/avalanche.svg" width="28" height="28" alt="">Avalanche P-Chain</span></div>
+      <div class="c56a43f">
+        <div class="c04584f">
+          <div>
+            <label class="c106943" for="amt">Your stake <small>Minimum 25 AVAX</small></label>
+            <div class="cc7f364"><input id="amt" type="number" min="25" max="3000000" step="any" value="1000" inputmode="decimal" aria-describedby="error"><span class="c424689"><img src="assets/tokens/avalanche.svg" alt="AVAX" width="28" height="28">AVAX</span></div>
+            <label class="c135e56" for="rng">Adjust stake between 25 and 10,000 AVAX</label><input class="ccbf8c1" id="rng" type="range" min="25" max="10000" step="25" value="1000">
+            <div class="cc55780"><span>25 AVAX</span><span>10,000 AVAX</span></div>
+          </div>
+          <div><span class="c106943" id="period-label">Staking period</span><div class="cbf2e84" role="group" aria-labelledby="period-label"><button type="button" data-days="14" aria-pressed="false">14 days</button><button type="button" data-days="90" aria-pressed="false">90 days</button><button type="button" data-days="180" aria-pressed="false">180 days</button><button type="button" data-days="365" aria-pressed="true">1 year</button></div></div>
+          <div><div class="c76fb48"><div><label for="apr">Gross annual rate (APR)</label><div class="c513171"><input id="apr" type="number" min="0" max="100" step="any" value="6.5" inputmode="decimal" aria-describedby="rate-note error"><span>%</span></div></div><div><label for="fee">Validator reward fee</label><div class="c513171"><input id="fee" type="number" min="2" max="100" step="any" value="2" inputmode="decimal" aria-describedby="rate-note error"><span>%</span></div></div></div><p class="cc6d097" id="rate-note">Enter your validator's APR and fee to calculate your return.</p><p class="cf6ee14" id="error" role="status"></p></div>
+        </div>
+        <div class="cc25d00">
+          <div aria-live="polite" aria-atomic="true"><p class="c143bf7">Your rewards over <span id="duration-label">1 year</span></p><div class="c78352d"><b id="rw">+63.70</b><span>AVAX</span></div><p class="cc6eda9"><b id="net-apr">6.37%</b> annual rate after validator fee</p></div>
+          <div class="c212a31"><svg id="ch" viewBox="0 0 400 84" width="400" height="84" role="img" aria-label="Reward calculation across 365 days: 63.70 AVAX. Rewards are paid at the end of the staking term."><defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E84142" stop-opacity=".13"/><stop offset="1" stop-color="#E84142" stop-opacity="0"/></linearGradient></defs><path d="M0 15 H400 M0 46 H400 M0 77 H400" stroke="#ecd8d1" stroke-dasharray="3 5" fill="none"/><path id="chart-area" d="M0 76 L400 10 V80 H0 Z" fill="url(#gf)"/><path id="chart-line" d="M0 76 L400 10" stroke="#E84142" stroke-width="2.5" fill="none"/><circle id="chart-dot" cx="400" cy="10" r="4" fill="#E84142" stroke="#fff1ed" stroke-width="3"/></svg><div class="cfee538"><span>Reward calculation · Day 0</span><span id="chart-end">Day 365</span></div></div>
+          <div class="c22cfed"><div><span>Total at term end</span><b id="tt">1,063.70 AVAX</b></div><div><span>Annualized rewards</span><b id="annual">63.70 AVAX</b></div></div>
+          <a class="c913bae" href="dashboard/">Stake AVAX <span class="ce53d06" aria-hidden="true">&#8599;</span></a><p class="cef5cee">Native staking rewards are paid at the end of your term.</p>
+        </div>
+      </div>
+      <div class="c9b94b0"><span>Gross rewards: <b id="gross">65.0000 AVAX</b> · Validator fee: <b id="commission">1.3000 AVAX</b></span><span>Simple APR · Network fees paid separately</span></div>
+    </div>
+    <div class="c898ddd"><div class="ca6c8b1"><b>25 AVAX</b><span>minimum delegation</span></div><div class="ca6c8b1"><b>14–365 days</b><span>delegation term</span></div><div class="ca6c8b1"><b>2% minimum</b><span>fee on rewards</span></div></div>
+  </section>
+  <div class="c13fdcd">
+    <section class="cde7ac5 c058b23" id="rewards" aria-labelledby="rewards-heading">
+      <div><h2 id="rewards-heading">How much can you earn<br>staking AVAX?</h2><p class="ced2c10">Your amount, annual rate, staking term, and validator fee shape your return. At 6.50% APR with a 2% reward fee, <strong>1,000 AVAX earns 63.70 AVAX over a year</strong>.</p><p class="ced2c10">Adjust the inputs above to compare amounts and terms. The network's reward formula also accounts for token supply and staking duration, so use the rate for your chosen term.</p><div class="ce694d9">Reward = stake × (APR ÷ 100) × (days ÷ 365) × (1 − fee ÷ 100)<span>Simple interest, after the validator fee and before transaction costs.</span></div></div>
+      <div><table class="cd65745"><caption>AVAX annual rewards by stake amount</caption><thead><tr><th scope="col">Amount staked</th><th scope="col">Gross rewards</th><th scope="col">After fee</th></tr></thead><tbody><tr><td>25 AVAX</td><td>1.625 AVAX</td><td>1.5925 AVAX</td></tr><tr><td>100 AVAX</td><td>6.50 AVAX</td><td>6.37 AVAX</td></tr><tr><td>500 AVAX</td><td>32.50 AVAX</td><td>31.85 AVAX</td></tr><tr><td>1,000 AVAX</td><td>65.00 AVAX</td><td>63.70 AVAX</td></tr><tr><td>2,000 AVAX</td><td>130.00 AVAX</td><td>127.40 AVAX</td></tr></tbody></table><p class="cac3d62">365 days · 6.50% gross APR · 2% validator reward fee. Rewards are denominated in AVAX; their fiat value follows the token price.</p></div>
+    </section>
+    <section class="cde7ac5" id="how-it-works" aria-labelledby="how-heading">
+      <h2 id="how-heading">How native AVAX staking works</h2><p class="ced2c10">Delegate on the P-Chain and help an existing validator secure Avalanche. You choose the amount, validator, end date, and reward address.</p>
+      <div class="c85cf73"><article><h3>Prepare AVAX on the P-Chain</h3><p>Use an Avalanche-compatible wallet. Transfer C-Chain AVAX to the P-Chain when needed, and leave a balance for network transaction costs.</p></article><article><h3>Choose a validator and term</h3><p>Compare uptime, reward fees, and available capacity. Your delegation end date must fall within the validator's active staking period.</p></article><article><h3>Confirm and receive rewards</h3><p>Review the transaction in your wallet. Your AVAX stays locked for the agreed term; eligible rewards and principal are released at maturity.</p></article></div><a class="c1e6770" href="dashboard/">Start Avax Staking <span aria-hidden="true">&#8599;</span></a>
+    </section>
+    <section class="cde7ac5" id="options" aria-labelledby="options-heading">
+      <h2 id="options-heading">Compare your AVAX staking options</h2><p class="ced2c10">Delegation suits token holders. Validation adds node operation. Liquid staking introduces a receipt token and protocol-specific exit rules.</p>
+      <div class="c26adef"><article class="c2aca0b"><h3>Native delegation</h3><p>Assign your stake to an existing validator while retaining your private keys. The calculator above uses this reward and fee structure.</p><dl><div><dt>Minimum stake</dt><dd>25 AVAX</dd></div><div><dt>Term</dt><dd>14 days to 1 year</dd></div></dl></article><article class="c2aca0b"><h3>Run a validator</h3><p>Operate a Primary Network node, maintain availability, and earn validation rewards plus fees from delegators.</p><dl><div><dt>Minimum stake</dt><dd>2,000 AVAX</dd></div><div><dt>Term</dt><dd>48 hours to 1 year</dd></div></dl></article><article class="c2aca0b"><h3>Liquid staking</h3><p>Stake through a protocol and receive a token representing the position. Compare smart contract exposure, redemption queues, and liquidity.</p><dl><div><dt>Minimum stake</dt><dd>Set by the protocol</dd></div><div><dt>Exit</dt><dd>Redemption or market sale</dd></div></dl></article></div>
+    </section>
+    <section class="cde7ac5" id="fees" aria-labelledby="fees-heading"><h2 id="fees-heading">AVAX staking fees and payout timing</h2><div class="c8d4b66"><dl class="c48babb"><div><dt>Validator reward fee</dt><dd>From 2% of rewards</dd></div><div><dt>P-Chain transaction fee</dt><dd>Dynamic, paid in AVAX</dd></div><div><dt>Delegation starts</dt><dd>When the P-Chain accepts it</dd></div><div><dt>Reward payout</dt><dd>At the end of your term</dd></div><div><dt>Access to staked AVAX</dt><dd>At the confirmed end date</dd></div></dl><div class="c54553b"><h3>A 2% fee means 2% of the reward</h3><p>On <strong>65 AVAX</strong> in gross rewards, the validator receives <strong>1.30 AVAX</strong>. You receive <strong>63.70 AVAX</strong> in rewards, plus your original stake at maturity.</p><p style="margin-top:12px">Network fees are separate transaction costs. Cross-chain transfers add export and import fees. Native rewards are paid once per term; reinvest them in a new stake to compound.</p></div></div></section>
+    <section class="cde7ac5 c1d98b9" id="security" aria-labelledby="security-heading"><div><h2 id="security-heading">AVAX staking security:<br>what to check</h2><p class="ced2c10">A validator's reliability affects reward eligibility. Your chosen term determines when your AVAX becomes available again.</p></div><div class="c0053a8"><article><h3>Validator uptime and available capacity</h3><p>Review performance and the remaining term. Validations beginning from the September 22, 2026 Helicon activation require 90% uptime for rewards; earlier validations use 80%.</p></article><article><h3>Custody and transaction details</h3><p>For native delegation, the protocol locks your stake and you retain your keys. Confirm the Node ID, amount, end date, and reward address before signing. Keep recovery phrases private.</p></article><article><h3>Reward eligibility and token value</h3><p>The Primary Network has no stake slashing. A validator that misses its uptime threshold can earn zero rewards. AVAX market value can change during the lock period.</p></article></div></section>
+    <section class="cde7ac5 c3693b3" id="faq" aria-labelledby="faq-heading"><div><h2 id="faq-heading">Avax Staking FAQ</h2><p class="ced2c10">The details behind your deposit,<br>rewards, and staking term.</p></div><div><details><summary>What is the minimum amount for Avax Staking?</summary><p>Native delegation starts at 25 AVAX. Running a Primary Network validator requires 2,000 AVAX. Keep additional AVAX available for transaction fees.</p></details><details><summary>How much can I earn staking 1,000 AVAX?</summary><p>At a gross APR of 6.50% and a 2% validator fee, 1,000 AVAX produces 65 AVAX in gross annual rewards. The validator fee is 1.30 AVAX, leaving 63.70 AVAX in annual rewards before network transaction costs. Change the APR and fee in the calculator to compare returns.</p></details><details><summary>When are AVAX staking rewards paid?</summary><p>Native delegation rewards are paid at the end of the delegation term when the validator meets the reward requirements. The staked AVAX returns at maturity. Annualized income expresses a yearly rate; the payout follows your chosen end date.</p></details><details><summary>Can I withdraw AVAX before my staking term ends?</summary><p>Native AVAX stays locked until the end date confirmed in the staking transaction. Choose a term that matches when you need access to your tokens. Liquid staking follows the withdrawal and redemption rules of the protocol you select.</p></details><details><summary>What is the difference between AVAX staking APR and APY?</summary><p>APR expresses annual rewards without reinvestment. APY includes the effect of compounding. Native AVAX rewards arrive at the end of a term; earning rewards on those rewards requires staking them again. This calculator uses APR and simple interest.</p></details><details><summary>Which chain is used for native AVAX staking?</summary><p>Native staking uses the Avalanche P-Chain. Move AVAX from the C-Chain to the P-Chain with a cross-chain transfer before delegating. Keep enough AVAX available for the export, import, and staking transaction fees.</p></details><details><summary>How do validator fees affect my AVAX rewards?</summary><p>The delegation fee is a percentage of the reward. A 2% fee on 65 AVAX in gross rewards is 1.30 AVAX, leaving 63.70 AVAX. The stake amount stays separate from this reward fee. Network transaction fees are additional.</p></details><details><summary>How do I choose a validator for AVAX staking?</summary><p>Compare observed uptime, fee, available delegation capacity, and staking end date. Your entire delegation must fit within the validator's active term. The reward uptime threshold is 90% for validations starting at or after the September 22, 2026 Helicon activation; earlier validations retain the 80% threshold.</p></details></div></section>
+    <section class="c0da6d5" aria-labelledby="start-heading"><div><h2 id="start-heading">Start Avax Staking with your chosen term</h2><p>Choose your amount and term, then continue to the dashboard.</p></div><a class="c913bae" href="dashboard/">Start staking <span class="ce53d06" aria-hidden="true">&#8599;</span></a></section>
+    <footer><span class="c7125db">Avax Staking</span><span>Avalanche P-Chain · Rewards in AVAX</span><div><a href="#calculator">Rewards calculator</a><a href="#faq">FAQ</a></div></footer>
+  </div>
 </main>
-</div>
-<script>
-/* Avax Staking: premium hero, mobile nav, scroll-reveal. */
-(function () {
-  "use strict";
-  document.documentElement.classList.add("js");
-  var $ = function (id) { return document.getElementById(id); };
-  function money(n) {
-    if (n >= 1e9) return "$" + (n / 1e9).toFixed(2) + "B";
-    if (n >= 1e6) return "$" + (n / 1e6).toFixed(2) + "M";
-    if (n >= 1e3) return "$" + (n / 1e3).toFixed(0) + "K";
-    return "$" + n.toFixed(0);
-  }
-  function grab(url) {
-    var controller = "AbortController" in window ? new AbortController() : null;
-    var timer = controller ? setTimeout(function () { controller.abort(); }, 6500) : null;
-    return fetch(url, controller ? { signal: controller.signal } : undefined)
-      .then(function (response) { if (!response.ok) throw new Error("HTTP " + response.status); return response.json(); })
-      .finally(function () { if (timer) clearTimeout(timer); });
-  }
-  var SIGNALS = [{"t": "price", "id": "sig-avalanche-2", "cg": "avalanche-2", "chg": true, "label": "Avax", "link": "https://www.coingecko.com/en/coins/avalanche-2"}, {"t": "mcap", "id": "sig-mc-avalanche-2", "cg": "avalanche-2", "label": "Market cap", "link": "https://www.coingecko.com/en/coins/avalanche-2"}, {"t": "price", "id": "sig-ethereum", "cg": "ethereum", "label": "ETH", "link": "https://www.coingecko.com/en/coins/ethereum"}];
-  (function(){
-    var S = SIGNALS; if(!S||!S.length) return;
-    function el(id){return document.getElementById(id);}
-    function hide(id){var e=el(id);if(e){var t=e.closest(".tick");if(t)t.style.display="none";}}
-    function set(id,x){var e=el(id);if(e)e.textContent=x;}
-    function usd(n){n=Number(n);return "$"+n.toLocaleString("en-US",{maximumFractionDigits:n<1?4:0});}
-    function big(n){n=Number(n);if(n>=1e9)return "$"+(n/1e9).toFixed(2)+"B";if(n>=1e6)return "$"+(n/1e6).toFixed(1)+"M";if(n>=1e3)return "$"+(n/1e3).toFixed(1)+"K";return "$"+Math.round(n);}
-    function jf(u){return fetch(u).then(function(r){if(!r.ok)throw 0;return r.json();});}
-    var coins = S.filter(function(s){return s.t==="price"||s.t==="mcap";});
-    if(coins.length){
-      var ids=coins.map(function(s){return s.cg;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(",");
-      jf("https://api.coingecko.com/api/v3/simple/price?ids="+ids+"&vs_currencies=usd&include_24hr_change=true&include_market_cap=true")
-        .then(function(v){coins.forEach(function(s){var d=v[s.cg];if(!d){hide(s.id);return;}
-          if(s.t==="mcap"){isFinite(d.usd_market_cap)&&d.usd_market_cap>0?set(s.id,big(d.usd_market_cap)):hide(s.id);return;}
-          if(isFinite(d.usd)){var x=usd(d.usd);if(s.chg&&isFinite(d.usd_24h_change)){var c=d.usd_24h_change;x+=" "+(c>=0?"▲":"▼")+Math.abs(c).toFixed(1)+"%";}set(s.id,x);}else hide(s.id);});})
-        .catch(function(){coins.forEach(function(s){hide(s.id);});});
-    }
-    S.forEach(function(s){
-      if(s.t==="tvl") jf("https://api.llama.fi/tvl/"+s.sl).then(function(v){var n=Number(v);isFinite(n)&&n>0?set(s.id,big(n)):hide(s.id);}).catch(function(){hide(s.id);});
-      else if(s.t==="vol") jf("https://api.llama.fi/summary/dexs/"+s.sl+"?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true").then(function(v){var n=v&&Number(v.total24h);isFinite(n)&&n>0?set(s.id,big(n)):hide(s.id);}).catch(function(){hide(s.id);});
-      else if(s.t==="ctvl") jf("https://api.llama.fi/v2/chains").then(function(a){var f=(a||[]).filter(function(c){return c.name===s.ch;})[0];f&&isFinite(f.tvl)&&f.tvl>0?set(s.id,big(f.tvl)):hide(s.id);}).catch(function(){hide(s.id);});
-    });
-  })();
-/* no live metrics on stake */
-
-  var swap = $("route-swap");
-  if (swap) swap.addEventListener("click", function () {
-    var from = $("asset-from"), to = $("asset-to"), hold = from.innerHTML;
-    from.innerHTML = to.innerHTML;
-    to.innerHTML = hold;
-  });
-
-  /* AMM / TWAMM route switch (preview label only). */
-  var modeToggle = $("mode-toggle");
-  if (modeToggle) modeToggle.addEventListener("click", function () {
-    var twamm = modeToggle.getAttribute("aria-checked") !== "true";
-    modeToggle.setAttribute("aria-checked", String(twamm));
-    var amm = $("ms-amm"), tw = $("ms-twamm"), name = $("route-name");
-    if (amm) amm.classList.toggle("is-on", !twamm);
-    if (tw) tw.classList.toggle("is-on", twamm);
-    /* no mode toggle */
-  });
-
-  /* Collapsed left menu: off-canvas drawer opened from the topbar, closed by scrim / Esc / link / close button. */
-  var shell = document.querySelector(".shell");
-  var sidebar = document.querySelector(".sidebar");
-  var sideNav = $("sideNav");
-  var scrim = document.querySelector("[data-scrim]");
-  var openBtn = document.querySelector("[data-nav-open]");
-  var closeBtn = document.querySelector(".nav-toggle");
-  function setNav(open) {
-    if (sidebar) sidebar.classList.toggle("is-open", open);
-    if (scrim) scrim.classList.toggle("is-open", open);
-    if (shell) shell.classList.toggle("nav-open", open);
-    if (openBtn) openBtn.setAttribute("aria-expanded", String(open));
-    if (closeBtn) closeBtn.setAttribute("aria-expanded", String(open));
-  }
-  if (openBtn) openBtn.addEventListener("click", function () { setNav(!(sidebar && sidebar.classList.contains("is-open"))); });
-  if (closeBtn) closeBtn.addEventListener("click", function () { setNav(false); });
-  if (scrim) scrim.addEventListener("click", function () { setNav(false); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") setNav(false); });
-  if (sideNav) sideNav.addEventListener("click", function (e) { if (e.target.closest("a")) setNav(false); });
-
-  /* Scroll-reveal: content is always in the HTML; this only animates it into view. */
-  var reveals = document.querySelectorAll(".reveal");
-  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reveals.length && "IntersectionObserver" in window && !reduce) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-    reveals.forEach(function (el) { io.observe(el); });
-  } else {
-    reveals.forEach(function (el) { el.classList.add("in"); });
-  }
-
-  /* Open (and reveal) the targeted section accordion when its fragment is used. */
-  function openHashTarget() {
-    var id = location.hash.slice(1);
-    if (!id) return;
-    var el = document.getElementById(id);
-    if (el && el.tagName === "DETAILS") { el.open = true; el.classList.add("in"); }
-  }
-  window.addEventListener("hashchange", openHashTarget);
-  openHashTarget();
-  document.addEventListener("click", function (e) {
-    var a = e.target.closest('a[href^="#"]');
-    if (!a) return;
-    var el = document.getElementById(a.getAttribute("href").slice(1));
-    if (el && el.tagName === "DETAILS") { el.open = true; el.classList.add("in"); }
-  });
-})();
-  (function(){
-    var links=[].slice.call(document.querySelectorAll(".toc a"));
-    if(!links.length)return;
-    var secs=[].slice.call(document.querySelectorAll(".doc-main [id]")).filter(function(s){return document.querySelector('.toc a[href="#'+s.id+'"]');});
-    if(!secs.length)return;
-    function setActive(id){links.forEach(function(a){a.classList.toggle("active",a.getAttribute("href")==="#"+id);});}
-    function update(){var cur=secs[0];for(var i=0;i<secs.length;i++){if(secs[i].getBoundingClientRect().top-120<=0)cur=secs[i];else break;}if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-4)cur=secs[secs.length-1];if(cur)setActive(cur.id);}
-    window.addEventListener("scroll",update,{passive:true});
-    window.addEventListener("resize",update);
-    update();
-  })();
-  </script>
 </body>
 </html>
