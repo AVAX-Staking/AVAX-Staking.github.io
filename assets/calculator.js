@@ -42,9 +42,9 @@ function draw() {
 }
 fields.forEach(field => field.addEventListener('input', draw));
 $('rng').addEventListener('input', () => { $('amt').value = $('rng').value; draw(); });
-document.querySelectorAll('.cbf2e84 button').forEach(button => button.addEventListener('click', () => {
+document.querySelectorAll('.c992c15 button').forEach(button => button.addEventListener('click', () => {
   days = Number(button.dataset.days);
-  document.querySelectorAll('.cbf2e84 button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+  document.querySelectorAll('.c992c15 button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
   draw();
 }));
 draw();
